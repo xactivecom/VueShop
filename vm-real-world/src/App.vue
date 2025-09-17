@@ -16,6 +16,7 @@ import { RouterLink, RouterView } from 'vue-router'
   </div>
 </template>
 
+ <!-- Global styles -->
 <style>
 #layout {
   font-family: Avenir, Helvetica, Arial, sans-serif;

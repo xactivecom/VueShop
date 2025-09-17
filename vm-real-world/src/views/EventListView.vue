@@ -3,9 +3,12 @@ import { ref, onMounted } from 'vue'
 import EventCard from '@/components/EventCard.vue'
 import EventService from '@/services/EventService.js'
 
+// Event list reference
 const events = ref(null)
 
+// Lifecycle hook before first render of component
 onMounted(() => {
+  // Get events using API
   EventService.getEvents()
     .then((response) => {
       events.value = response.data

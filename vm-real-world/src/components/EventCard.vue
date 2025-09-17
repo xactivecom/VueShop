@@ -1,5 +1,6 @@
 <script setup>
 defineProps({
+  // Event object
   event: {
     type: Object,
     required: true,
