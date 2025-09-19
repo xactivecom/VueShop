@@ -32,6 +32,8 @@ onMounted(() => {
 <template>
   <div v-if="event">
     <h1>{{ event.title }}</h1>
+
+    <!-- Secondary navigation -->
     <div id="nav">
       <router-link :to="{ name: 'EventDetails' }">Details</router-link>
       |
