@@ -1,14 +1,17 @@
 
 import { createRouter, createWebHistory } from "vue-router";
+import NotFound from "@/views/NotFound.vue";
+import NetworkError from "@/views/NetworkError.vue";
+
+import About from "@/views/About.vue";
+
 import EventList from "@/views/EventList.vue";
 import EventLayout from "@/views/event/Layout.vue";
 import EventDetails from "@/views/event/Details.vue";
 import EventRegister from "@/views/event/Register.vue";
 import EventEdit from "@/views/event/Edit.vue";
-import About from "@/views/About.vue";
-import NotFound from "@/views/NotFound.vue";
-import NetworkError from "@/views/NetworkError.vue";
 
+// Route configuration
 const routes = [
   {
     path: "/",
@@ -71,6 +74,14 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    // Always scroll to the top of next page, unless saved position was set
+    if (savedPosition) {
+      return savedPositions;
+    } else {
+      return { top: 0 };
+    }
+  }
 });
 
 export default router
