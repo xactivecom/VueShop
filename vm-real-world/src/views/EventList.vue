@@ -1,10 +1,12 @@
 <script setup>
 import { computed, ref, onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
 
 import EventCard from "@/components/EventCard.vue";
 import EventService from "@/services/EventService.js";
 
 const props = defineProps(["page"]);
+const router = useRouter();
 
 // Event list reference
 const events = ref(null);
@@ -23,7 +25,7 @@ const fetchEvents = () => {
 			totalEvents.value = response.headers["x-total-count"];
 		})
 		.catch((error) => {
-			console.log(error);
+      router.push({ name: "NetworkError" });
 		});
 };
 
