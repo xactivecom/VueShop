@@ -4,10 +4,14 @@ The courses use the Vue Composition API syntax with TypeScript.
 
 https://www.vuemastery.com/courses/vue3-typescript
 
-### Approach
-Instead of following the slightly dated course approach, instead the Vite tool was
-used to start the project. The result is that the project config files do not match
-the old code repository.
+The source code repo with all branches is:
+
+https://github.com/Code-Pop/Real-World-Vue-3-TypeScript.git
+
+
+### Create Project
+Instead of following the slightly outdated course, the approach was to use better Vite tooling
+to create the project. The result is that some project config files do not match the source repo.
 
 From the root folder, create vite-based project:
 ```bash

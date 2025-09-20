@@ -1,5 +1,17 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+//import { createApp, reactive } from 'vue';
+import { createApp } from 'vue';
 
-createApp(App).mount('#app')
+import App from './App.vue';
+import router from "./router";
+
+// Reactive global flash message store
+// const GStore = reactive({ flashMessage: "" });
+
+// Create app instance
+const app = createApp(App);
+
+// Add app middleware
+app.use(router);
+//app.provide("GStore", GStore);
+app.mount("#app");
+
