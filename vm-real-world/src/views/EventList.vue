@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import EventCard from "@/components/EventCard.vue";
 import EventService from "@/services/EventService.js";
 
+// Properties
 const props = defineProps(["page"]);
 const router = useRouter();
 

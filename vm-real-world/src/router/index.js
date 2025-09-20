@@ -77,7 +77,7 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     // Always scroll to the top of next page, unless saved position was set
     if (savedPosition) {
-      return savedPositions;
+      return savedPosition;
     } else {
       return { top: 0 };
     }

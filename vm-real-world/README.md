@@ -1,35 +1,14 @@
-# vm-real-world
+# Sock Store Demo
+Example based on combined content from the Vue Mastery courses "Real World Vue 3" and "Touring Vue Router".
+The courses use the Vue Composition API syntax with JavaScript.
 
-This template should help get you started developing with Vue 3 in Vite.
+https://www.vuemastery.com/courses/real-world-vue-3-composition-api/
 
-## Recommended IDE Setup
+https://www.vuemastery.com/courses/touring-vue-router-composition-api
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-## Customize configuration
+The source code repos with all branches are:
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+https://github.com/Code-Pop/Real-World_Vue-3.git
 
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+https://github.com/Code-Pop/Touring-Vue-Router-Composition-API.git
