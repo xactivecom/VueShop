@@ -1,4 +1,4 @@
-# Sock Store Demo
+# Real World Demo
 Example based on combined content from the Vue Mastery courses "Real World Vue 3" and "Touring Vue Router".
 The courses use the Vue Composition API syntax with JavaScript.
 
