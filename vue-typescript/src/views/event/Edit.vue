@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { EventItem } from "../../types";
+import type { EventProps } from "../../types";
 
+// Properties
 defineProps<{
-  event: EventItem
+  event: EventProps
 }>();
 </script>
 

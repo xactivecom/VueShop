@@ -1,5 +1,7 @@
 import axios from "axios";
+import { type EventProps } from "../types";
 
+// API client handle
 const apiClient = axios.create({
   baseURL: "https://my-json-server.typicode.com/Code-Pop/Real-World_Vue-3",
   withCredentials: false,
@@ -10,10 +12,13 @@ const apiClient = axios.create({
 });
 
 export default {
-  getEvents(perPage: number, page: number) {
-    return apiClient.get("/events?_limit=" + perPage + "&_page=" + page);
+  // Get events
+  async getEvents(perPage: number, page: number) {
+    return await apiClient.get<EventProps[]>("/events?_limit=" + perPage + "&_page=" + page);
   },
-  getEvent(id: number) {
-    return apiClient.get("/events/" + id);
+
+  // Get event
+  async getEvent(id: number) {
+    return await apiClient.get<EventProps>("/events/" + id);
   },
 };

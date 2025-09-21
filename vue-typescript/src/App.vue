@@ -1,16 +1,16 @@
 <script setup lang="ts">
-//import { inject } from "vue";
+import { inject } from "vue";
 
 // Flash message store
-//const GStore = inject("GStore");
+const gstore = inject("gstore");
 </script>
 
 <template>
   <div id="app">
     <!-- Flash message area-->
-    <!-- <div id="flashMessage" v-if="GStore?.flashMessage">
-      {{ GStore.flashMessage }}
-    </div> -->
+    <div id="flashMessage" v-if="gstore?.flashMessage">
+      {{ gstore.flashMessage }}
+    </div>
 
     <!-- Top navigation -->
     <div id="nav">
@@ -40,6 +40,7 @@
   }
 }
 
+/* Flash message ID style */
 #flashMessage {
   animation-name: yellowfade;
   animation-duration: 3s;

@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import type { EventItem } from "../../types";
+import type { EventProps } from "../../types";
 
-defineProps<{
-  event: EventItem
+// Properties
+const props = defineProps<{
+  event: EventProps
 }>();
+const { event } = props;
 </script>
 
 <template :event>

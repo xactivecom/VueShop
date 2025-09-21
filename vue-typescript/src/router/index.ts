@@ -12,12 +12,14 @@ import EventRegister from "../views/event/Register.vue";
 import EventEdit from "../views/event/Edit.vue";
 
 // Route configuration
-const routes = [
+const routes: any = [
   {
     path: "/",
     name: "EventList",
     component: EventList,
-    props: (route: string) => ({ page: parseInt(route.query.page) || 1 }),
+    props: (route: { query: { page: string; }; }) => ({ 
+      page: parseInt(route.query.page) || 1
+    }),
   },
   {
     path: "/events/:id",
@@ -44,7 +46,7 @@ const routes = [
   },
   {
     path: "/event/:afterEvent(.*)",
-    redirect: (to) => {
+    redirect: (to: { params: { afterEvent: string; }; }) => {
       return { path: "/events/" + to.params.afterEvent };
     },
   },
@@ -74,7 +76,7 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  scrollBehavior(to, from, savedPosition) {
+  scrollBehavior(_to, _from, savedPosition) {
     // Always scroll to the top of next page, unless saved position was set
     if (savedPosition) {
       return savedPosition;

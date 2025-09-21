@@ -1,22 +1,28 @@
 <script setup lang="ts">
-//import { inject } from "vue";
+import { inject } from "vue";
 import { useRouter } from "vue-router";
+import type { EventProps } from "../../types";
 
 // Properties
-//const { event } = defineProps(["event"]);
+const props = defineProps<{
+  event: EventProps
+}>();
+const { event } = props;
+
+// Router for page transition
 const router = useRouter();
 
 // Reactive global store for messages
-//const GStore = inject("GStore");
+const gstore = inject("gstore");
 
 const register = () => {
   // TODO: Call API
 
   // Flash a success message
-  // GStore.flashMessage = "You are successfully registered for " + event.title;
-  // setTimeout(() => {
-  //   GStore.flashMessage = "";
-  // }, 3000);
+  gstore.flashMessage = "You are successfully registered for " + event.title;
+  setTimeout(() => {
+    gstore.flashMessage = "";
+  }, 3000);
 
   // If registered then redirect to event details
   router.push({
@@ -26,6 +32,6 @@ const register = () => {
 </script>
 
 <template>
-  <p>Register for the event here</p>
+  <p>Register for the event here.</p>
   <button @click="register">Register Me</button>
 </template>

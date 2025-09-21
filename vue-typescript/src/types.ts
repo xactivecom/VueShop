@@ -1,5 +1,5 @@
-// Event object type
-export interface EventItem {
+// Event properties
+export interface EventProps {
   id: number;
   category: string;
   title: string;

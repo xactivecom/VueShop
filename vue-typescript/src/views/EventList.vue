@@ -1,34 +1,33 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from "vue";
+import { computed, ref, type Ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 
 import EventCard from "../components/EventCard.vue";
 import EventService from "../services/EventService.js";
-//import { type EventItem } from "../types";
+import { type EventProps } from "../types";
 
 // Properties
 const props = defineProps(["page"]);
 const router = useRouter();
 
 // Event list reference
-const events = ref(null);
+const events: Ref<EventProps[] | null> = ref(null);
 
 // Number of total events
 const totalEvents = ref(0);
 
 // Fetch events from the EventService
-const fetchEvents = () => {
+const fetchEvents = async () => {
   // Get events using API
-	EventService.getEvents(2, props.page)
-		.then((response) => {
-			events.value = response.data;
+  try {
+	  const response = await EventService.getEvents(2, props.page);
+    events.value = response.data;
 
-      // The number of total events is indicated in the response header
-			totalEvents.value = response.headers["x-total-count"];
-		})
-		.catch((error) => {
-      router.push({ name: "NetworkError" });
-		});
+    // The number of total events is indicated in the response header
+    totalEvents.value = response.headers["x-total-count"];
+	} catch (_error) {
+    router.push({ name: "NetworkError" });
+  }
 };
 
 // Determine if at the end of event data
@@ -38,16 +37,16 @@ const hasNextPage = computed(() => {
 });
 
 // Lifecycle hook before first render of component
-onMounted(() => {
-	fetchEvents();
+onMounted(async () => {
+	await fetchEvents();
 });
 
 // Watch for page property change, then call function to fetch events
 watch(
   () => props.page, 
-  () => {
+  async () => {
     events.value = null;
-    fetchEvents();
+    await fetchEvents();
   }
 )
 </script>
