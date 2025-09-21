@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { inject } from "vue";
+import { type GStore } from "./types";
 
 // Flash message store
-const gstore = inject("gstore");
+const gstore = inject<GStore>("gstore");
 </script>
 
 <template>

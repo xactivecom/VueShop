@@ -9,3 +9,8 @@ export interface EventProps {
   time: string;
   organizer: string;
 }
+
+// Global store
+export interface GStore {
+  flashMessage: string;
+}

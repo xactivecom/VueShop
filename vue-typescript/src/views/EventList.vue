@@ -36,9 +36,13 @@ const hasNextPage = computed(() => {
 	return props.page < totalPages;
 });
 
+// Data load indicator
+const loading = ref(true);
+
 // Lifecycle hook before first render of component
 onMounted(async () => {
 	await fetchEvents();
+  loading.value = false;
 });
 
 // Watch for page property change, then call function to fetch events
@@ -54,6 +58,7 @@ watch(
 <template>
   <h1>Events For Good</h1>
   <div class="events">
+    <p v-if="loading == true">Loading...</p>
     <EventCard v-for="event in events" :key="event.id" :event="event" />
 
     <div class="pagination">
