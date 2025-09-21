@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, type Ref, onMounted, watch } from "vue";
+import { computed, ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 
 import EventCard from "../components/EventCard.vue";
@@ -11,7 +11,7 @@ const props = defineProps(["page"]);
 const router = useRouter();
 
 // Event list reference
-const events: Ref<EventProps[] | null> = ref(null);
+const events = ref<EventProps[] | null>(null);
 
 // Number of total events
 const totalEvents = ref(0);
