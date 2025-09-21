@@ -12,14 +12,14 @@ const apiClient = axios.create({
 });
 
 // Time delay to simulate network delay
-// async function _sleep(intv: number): Promise<void> {
-//   return new Promise((resolove) => setTimeout(resolove, intv));
-// } 
+async function sleep(intv: number): Promise<void> {
+  return new Promise((resolove) => setTimeout(resolove, intv));
+} 
 
 export default {
   // Get events
   async getEvents(perPage: number, page: number) {
-    // await _sleep(1000);
+    await sleep(500);
     return await apiClient.get<EventProps[]>("/events?_limit=" + perPage + "&_page=" + page);
   },
 

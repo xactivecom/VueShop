@@ -4,11 +4,15 @@ import { useRouter } from "vue-router";
 
 import EventCard from "../components/EventCard.vue";
 import EventService from "../services/EventService.js";
+import LoadingIndicator from "../components/LoadingIndicator.vue";
 import { type EventProps } from "../types";
 
 // Properties
 const props = defineProps(["page"]);
 const router = useRouter();
+
+// Data loading indicator
+const isLoading = ref(false);
 
 // Event list reference
 const events = ref<EventProps[] | null>(null);
@@ -18,6 +22,9 @@ const totalEvents = ref(0);
 
 // Fetch events from the EventService
 const fetchEvents = async () => {
+  // Look busy
+  isLoading.value = true;
+
   // Get events using API
   try {
 	  const response = await EventService.getEvents(2, props.page);
@@ -27,6 +34,8 @@ const fetchEvents = async () => {
     totalEvents.value = response.headers["x-total-count"];
 	} catch (_error) {
     router.push({ name: "NetworkError" });
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -36,13 +45,9 @@ const hasNextPage = computed(() => {
 	return props.page < totalPages;
 });
 
-// Data load indicator
-const loading = ref(true);
-
 // Lifecycle hook before first render of component
 onMounted(async () => {
 	await fetchEvents();
-  loading.value = false;
 });
 
 // Watch for page property change, then call function to fetch events
@@ -58,20 +63,22 @@ watch(
 <template>
   <h1>Events For Good</h1>
   <div class="events">
-    <p v-if="loading == true">Loading...</p>
-    <EventCard v-for="event in events" :key="event.id" :event="event" />
+    <LoadingIndicator v-if="isLoading == true" text="Loading events..." />
+    <div v-if="events && !isLoading">
+      <EventCard v-for="event in events" :key="event.id" :event="event" />
 
-    <div class="pagination">
-      <router-link
-        :to="{ name: 'EventList', query: { page: page - 1 } }"
-        rel="prev"
-        v-if="page != 1"
-      >&#60; Prev</router-link>
-      <router-link
-        :to="{ name: 'EventList', query: { page: page + 1 } }"
-        rel="next"
-        v-if="hasNextPage"
-      >Next &#62;</router-link>
+      <div class="pagination">
+        <router-link
+          :to="{ name: 'EventList', query: { page: page - 1 } }"
+          rel="prev"
+          v-if="page != 1"
+        >&#60; Prev</router-link>
+        <router-link
+          :to="{ name: 'EventList', query: { page: page + 1 } }"
+          rel="next"
+          v-if="hasNextPage"
+        >Next &#62;</router-link>
+      </div>
     </div>
   </div>
 </template>
