@@ -2,10 +2,10 @@
 import { computed, ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 
-import EventCard from "../components/EventCard.vue";
-import EventService from "../services/EventService.js";
-import LoadingIndicator from "../components/LoadingIndicator.vue";
-import { type EventProps } from "../types";
+import EventCard from "@/components/EventCard.vue";
+import EventService from "@/services/EventService.js";
+import LoadingIndicator from "@/components/LoadingIndicator.vue";
+import { type EventProps } from "@/types";
 
 // Properties
 const props = defineProps(["page"]);

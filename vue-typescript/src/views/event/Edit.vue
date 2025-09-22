@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { EventProps } from "../../types";
+// import type { EventProps } from "@/types";
 
 // Properties
-defineProps<{
-  event: EventProps
-}>();
+// defineProps<{
+//   event: EventProps,
+// }>();
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 import type { PlayerTag, PlayerDetail } from "../types.ts";
 
-async function searchPlayersByName(name: string): Promise<PlayerTag[]> {
-  const result = await fetch("/http://localhost:4000/players?name=" + name);
+async function searchPlayersByName(query: string): Promise<string[]> {
+  const result = await fetch("/http://localhost:4000/players?query=" + query);
   return result.json();
 }
 

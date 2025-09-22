@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { inject } from "vue";
 import { useRouter } from "vue-router";
-import type { EventProps, GStore } from "../../types";
+
+import type { EventProps, GStore } from "@/types";
 
 // Properties
 const props = defineProps<{

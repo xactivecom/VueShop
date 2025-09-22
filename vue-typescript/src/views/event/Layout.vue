@@ -2,8 +2,8 @@
 import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
-import EventService from "../../services/EventService.js";
-import { type EventProps } from "../../types";
+import EventService from "@/services/EventService.js";
+import { type EventProps } from "@/types";
 
 const props = defineProps(["id"]);
 const router = useRouter();

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { type EventProps } from "../types";
+import { type EventProps } from "@/types";
 
 // API client handle
 const apiClient = axios.create({

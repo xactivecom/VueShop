@@ -1,11 +1,12 @@
 <script setup lang="ts">
-defineProps({
-  resource: {
-    type: String,
-    required: true,
-    default: "page",
-  },
+
+// Properties
+const props = withDefaults(defineProps<{
+  resource: string,
+}>(), {
+  resource: "page",
 });
+const { resource } = props;
 </script>
 
 <template>
