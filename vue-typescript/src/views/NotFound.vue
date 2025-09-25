@@ -1,12 +1,9 @@
 <script setup lang="ts">
 
 // Properties
-const props = withDefaults(defineProps<{
+const { resource = "page" } = defineProps<{
   resource: string,
-}>(), {
-  resource: "page",
-});
-const { resource } = props;
+}>();
 </script>
 
 <template>

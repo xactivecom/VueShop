@@ -2,10 +2,9 @@
 import type { EventProps } from "@/types";
 
 // Properties
-const props = defineProps<{
+const { event } = defineProps<{
   event: EventProps,
 }>();
-const { event } = props;
 </script>
 
 <template :event>

@@ -5,10 +5,9 @@ import { useRouter } from "vue-router";
 import type { EventProps, GStore } from "@/types";
 
 // Properties
-const props = defineProps<{
+const { event } = defineProps<{
   event: EventProps
 }>();
-const { event } = props;
 
 // Router for page transition
 const router = useRouter();
