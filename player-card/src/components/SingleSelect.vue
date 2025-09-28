@@ -93,6 +93,11 @@ const selectItem = (item: T) => {
   emit("select", item);
 };
 
+const isSelected = (item: T): boolean => {
+  //console.log('selected ', selectedItem.value, item)
+  return selectedItem && getItemValue(selectedItem) === getItemValue(item);
+};
+
 // Watch for external modelValue changes
 watch(() => props.modelValue, (newValue) => {
   selectedItem.value = newValue;
@@ -131,8 +136,7 @@ watch(() => props.modelValue, (newValue) => {
               <Check
                 :class="[
                   'mr-2 h-4 w-4',
-                  selectedItem && getItemValue(selectedItem) === getItemValue(item)
-                    ? 'opacity-100' : 'opacity-0'
+                  selectedItem && getItemValue(selectedItem) === getItemValue(item) ? 'opacity-100' : 'opacity-0'
                 ]"
               />
               {{ getItemLabel(item) }}

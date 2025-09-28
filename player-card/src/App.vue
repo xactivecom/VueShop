@@ -182,7 +182,32 @@ onMounted(() => {
     </div>
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <span class="p-2 pt-4 text-xs text-blue-500">Single selection field. Verical aligned label.</span>
+      <span class="p-2 pt-4 text-xs text-blue-500">Multiple selection field. Verical aligned label.</span>
+      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
+        <Label for="reportType">Game Type</Label>
+        <MultiSelect
+          v-model = "selectedGameTypes"
+          :items = "gameTypes"
+          valueKey = "id"
+          labelKey = "label"
+          placeholder = "Select game types ..."
+          searchPlaceholder = "Search game types ..."
+          emptyStateText = "No game types found."
+          groupHeading = "Game typess"
+          @select = "onTeamSelect"
+          @selectAll = "onGameTypeSelectAll"
+          @clearAll = "onGameTypeClearAll"
+        />
+      </div>
+      <div class="p-2 text-xs text-gray-500">
+        <div v-for="type in selectedGameTypes">
+          Selected type: {{ type?.id }}, name: {{ type?.label }}
+        </div>
+      </div>
+    </div>
+
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+      <span class="p-2 pt-4 text-xs text-blue-500">Multiple selection field. Verical aligned label.</span>
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="reportType">Select Team</Label>
         <MultiSelect
@@ -200,7 +225,9 @@ onMounted(() => {
         />
       </div>
       <div class="p-2 text-xs text-gray-500">
-        Selected team: {{ selectedTeams?.id }}, name: {{ selectedTeams?.label }}
+        <div v-for="team in selectedTeams">
+          Selected team: {{ team?.id }}, name: {{ team?.label }}
+        </div>
       </div>
     </div>
 
