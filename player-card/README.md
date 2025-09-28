@@ -66,7 +66,14 @@ Prompt:
 Install some shadcn components:
 ```bash
 npx shadcn-vue@latest add button input label
-npx shadcn-vue@latest add combobox
+npx shadcn-vue@latest add checkbox badge
+npx shadcn-vue@latest add popover command
+```
+
+Install some shadcn table components:
+```bash
+npx shadcn-vue@latest add table
+npm install @tanstack/vue-table
 ```
 
 ### Code changes
