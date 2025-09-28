@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { ref, computed } from "vue";
+<script setup lang="ts" generic="T">
+import { ref, computed, watch } from "vue";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -16,15 +16,9 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronDown } from "lucide-vue-next";
 
-// Definition for select item
-export interface SingleSelectItem {
-  id: string;
-  label: string;
-}
-
 // Properties interface
-interface Props<SingleSelectItem> {
-  items: SingleSelectItem[];
+interface Props<T> {
+  items: T[];
   placeholder?: string;
   searchPlaceholder?: string;
   emptyStateText?: string;
@@ -32,13 +26,14 @@ interface Props<SingleSelectItem> {
   buttonClass?: string;
   popoverClass?: string;
   listClass?: string;
-  maxVisibleItems?: number;
-  modelValue?: SingleSelectItem | null;
+  valueKey: keyof T;
+  labelKey: keyof T;
+  modelValue?: T | null;
 }
 
 // Define propeties with defaults
 // listClass: height 36px + (5 items * 44px)
-const props = withDefaults(defineProps<Props<SingleSelectItem>>(), {
+const props = withDefaults(defineProps<Props<T>>(), {
   placeholder: "Select item...",
   searchPlaceholder: "Search items...",
   emptyStateText: "No items found.",
@@ -46,20 +41,19 @@ const props = withDefaults(defineProps<Props<SingleSelectItem>>(), {
   buttonClass: "w-[300px] justify-between",
   popoverClass: "w-[300px] p-0",
   listClass: "max-h-[256px] overflow-y-auto",
-  maxVisibleItems: 5,
   modelValue: null,
 });
 
 // Define emits
 const emit = defineEmits<{
-  "update:modelValue": [value: SingleSelectItem | null];
-  "select": [item: SingleSelectItem];
+  "update:modelValue": [value: T | null];
+  "select": [item: T];
 }>();
 
 // Reactive state
 const open = ref(false);
 const searchValue = ref("");
-const selectedItem = ref<SingleSelectItem | null | undefined>(props.modelValue);
+const selectedItem = ref<T | null | undefined>(props.modelValue);
 
 // Computed properties
 const displayValue = computed(() => {
@@ -68,17 +62,28 @@ const displayValue = computed(() => {
     : props.placeholder;
 });
 
-const filteredItems = computed(() => {
+const filteredItems = computed((): T[] => {
   if (!searchValue.value) return props.items;
   
   return props.items.filter(item =>
-    item.label
+    getItemLabel(item)
       .toLowerCase()
       .includes(searchValue.value.toLowerCase())
   );
 });
 
-const selectItem = (item: SingleSelectItem) => {
+// Helper functions
+const getItemValue = (item: T): string => {
+  const value = item[props.valueKey];
+  return typeof value === 'string' ? value : String(value);
+};
+
+const getItemLabel = (item: T): string => {
+  const label = item[props.labelKey];
+  return typeof label === 'string' ? label : String(label);
+};
+
+const selectItem = (item: T) => {
   selectedItem.value = item;
   open.value = false;
   searchValue.value = "";
@@ -89,7 +94,6 @@ const selectItem = (item: SingleSelectItem) => {
 };
 
 // Watch for external modelValue changes
-import { watch } from "vue";
 watch(() => props.modelValue, (newValue) => {
   selectedItem.value = newValue;
 });
@@ -120,17 +124,18 @@ watch(() => props.modelValue, (newValue) => {
           <CommandGroup :heading="groupHeading">
             <CommandItem
               v-for="item in filteredItems"
-              :key="item.id"
-              :value="item.id"
+              :key="getItemValue(item)"
+              :value="getItemValue(item)"
               @select="selectItem(item)"
             >
               <Check
                 :class="[
                   'mr-2 h-4 w-4',
-                  selectedItem && selectedItem.id === item.id ? 'opacity-100' : 'opacity-0'
+                  selectedItem && getItemValue(selectedItem) === getItemValue(item)
+                    ? 'opacity-100' : 'opacity-0'
                 ]"
               />
-              {{ item.label }}
+              {{ getItemLabel(item) }}
             </CommandItem>
           </CommandGroup>
         </CommandList>

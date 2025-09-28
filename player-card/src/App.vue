@@ -7,8 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 // import { Search } from "lucide-vue-next"; // Search icon
 
-import SingleSelect, { type SingleSelectItem } from "@/components/SingleSelect.vue";
-// import MultiSelect from "@/components/MultiSelect.vue";
+import SingleSelect from "@/components/SingleSelect.vue";
+import MultiSelect from "@/components/MultiSelect.vue";
 // import SingleCombo from "@/components/SingleCombo.vue";
 // import MultiCombo from "@/components/MultiCombo.vue";
 
@@ -16,7 +16,11 @@ import SingleSelect, { type SingleSelectItem } from "@/components/SingleSelect.v
 const isActiveOnly = ref(true);
 
 // Report type selections
-const reportTypes: SingleSelectItem[] = [
+interface ReportType {
+  id: String;
+  label: string;
+}
+const reportTypes: ReportType[] = [
   { id: "summary", label: "Summary" },
   { id: "bio", label: "Bio Info" },
   { id: "faceoff", label: "Face-off" },
@@ -25,23 +29,44 @@ const reportTypes: SingleSelectItem[] = [
 ];
 
 // Reactive state
-const selectedReportType = ref<SingleSelectItem | null | undefined>(null);
+const selectedReportType = ref<ReportType | null>(null);
 
 // Event handlers
-const onReportSelect = (report: SingleSelectItem) => {
+const onReportSelect = (report: ReportType) => {
   console.log('Report selected:', report);
 }
 
 // Game type selections
-const gameTypes = [
+interface GameType {
+  id: String;
+  label: string;
+}
+const gameTypes: GameType[] = [
   { id: "regular", label: "Regular Season" },
   { id: "playoff", label: "Playoffs" },
   { id: "combined", label: "Combined" },
 ];
 
+// Reactive state
+const selectedGameTypes = ref<GameType[] | null>([]);
+
+// Event handlers
+const onGameTypeSelect = (gameType: GameType, selected: boolean) => {
+  console.log('Game type selected:', gameType, selected);
+}
+const onGameTypeSelectAll = (gameTypes: GameType[]) => {
+  console.log('Game type all selected:', gameTypes.length);
+}
+const onGameTypeClearAll = () => {
+  console.log('Game type all cleared:');
+}
+
 // Team selections
-const franchiseTeams: SingleSelectItem[] = [
-  { id: "all", label: "All Franchises" },
+interface FranchiseTeam {
+  id: String;
+  label: string;
+}
+const franchiseTeams: FranchiseTeam[] = [
   { id: "ana", label: "Anaheim Ducks" },
   { id: "bos", label: "Boston Bruins" },
   { id: "buf", label: "Buffalo Sabres" },
@@ -56,18 +81,27 @@ const franchiseTeams: SingleSelectItem[] = [
 ];
 
 // Reactive state
-const selectedTeam = ref<SingleSelectItem | null | undefined>(null);
+const selectedTeams = ref<FranchiseTeam[] | null>([]);
 
 // Event handlers
-const onTeamSelect = (team: SingleSelectItem) => {
-  console.log('Team selected:', team);
+const onTeamSelect = (team: FranchiseTeam, selected: boolean) => {
+  console.log('Team selected:', team, selected);
+}
+const onTeamSelectAll = (teams: FranchiseTeam[]) => {
+  console.log('Teams all selected:', teams.length);
+}
+const onTeamClearAll = () => {
+  console.log('Teams all cleared:');
 }
 
 // Set default selections
 import { onMounted } from 'vue';
 onMounted(() => {
+  // Default to the first report type
+  // selectedReportType.value = reportTypes[0];
+
   // Default to the "All" team
-  selectedTeam.value = franchiseTeams[0];
+  selectedTeams.value = franchiseTeams ?? [franchiseTeams[0]];
 });
 </script>
 
@@ -132,7 +166,8 @@ onMounted(() => {
         <SingleSelect
           v-model = "selectedReportType"
           :items = "reportTypes"
-          :maxVisibleItems = 3
+          valueKey = "id"
+          labelKey = "label"
           placeholder = "Select report ..."
           searchPlaceholder = "Search reports ..."
           emptyStateText = "No report found."
@@ -150,19 +185,22 @@ onMounted(() => {
       <span class="p-2 pt-4 text-xs text-blue-500">Single selection field. Verical aligned label.</span>
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="reportType">Select Team</Label>
-        <SingleSelect
-          v-model = "selectedTeam"
+        <MultiSelect
+          v-model = "selectedTeams"
           :items = "franchiseTeams"
-          :maxVisibleItems = 5
-          placeholder = "Select team ..."
+          valueKey = "id"
+          labelKey = "label"
+          placeholder = "Select teams ..."
           searchPlaceholder = "Search teams ..."
-          emptyStateText = "No team found."
+          emptyStateText = "No teams found."
           groupHeading = "Franchise Teams"
           @select = "onTeamSelect"
+          @selectAll = "onTeamSelectAll"
+          @clearAll = "onTeamClearAll"
         />
       </div>
       <div class="p-2 text-xs text-gray-500">
-        Selected team: {{ selectedTeam?.id }}, name: {{ selectedTeam?.label }}
+        Selected team: {{ selectedTeams?.id }}, name: {{ selectedTeams?.label }}
       </div>
     </div>
 
