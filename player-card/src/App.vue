@@ -7,10 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 // import { Search } from "lucide-vue-next"; // Search icon
 
-import SingleSelect from "@/components/SingleSelect.vue";
 import MultiSelect from "@/components/MultiSelect.vue";
-// import SingleCombo from "@/components/SingleCombo.vue";
-// import MultiCombo from "@/components/MultiCombo.vue";
 
 // Search model for activeOnly checkbox
 const isActiveOnly = ref(true);
@@ -29,11 +26,59 @@ const reportTypes: ReportType[] = [
 ];
 
 // Reactive state
-const selectedReportType = ref<ReportType | null>(null);
+const selectedReportTypes = ref<ReportType[] | null>([]);
 
 // Event handlers
-const onReportSelect = (report: ReportType) => {
-  console.log('Report selected:', report);
+const onReportTypeSelect = (reportType: ReportType, selected: boolean) => {
+  console.log('Report type selected:', reportType, selected);
+}
+const onReportTypeSelectAll = (reportTypes: ReportType[]) => {
+  console.log('Report types all selected:', reportTypes.length);
+}
+const onReportTypeClearAll = () => {
+  console.log('Report types all cleared:');
+}
+
+// Season selections
+interface Season {
+  id: String;
+  label: string;
+}
+const seasons: Season[] = [
+  { id: "20252026", label: "2025-26" },
+  { id: "20242025", label: "2024-25" },
+  { id: "20232024", label: "2023-24" },
+  { id: "20222023", label: "2022-23" },
+  { id: "20212022", label: "2021-22" },
+  { id: "20202021", label: "2020-21" },
+  { id: "20192020", label: "2019-20" },
+  { id: "20182019", label: "2018-19" },
+  { id: "20172018", label: "2017-18" },
+  { id: "20102011", label: "2010-11" },
+  { id: "20002001", label: "2000-01" },
+  { id: "19992000", label: "1999-00" },
+  { id: "19901991", label: "1990-91" },
+  { id: "19801981", label: "1980-81" },
+  { id: "19711972", label: "1971-72" },
+  { id: "19701971", label: "1970-71" },
+  { id: "19611962", label: "1961-62" },
+  { id: "19601961", label: "1960-61" },
+  { id: "19511952", label: "1951-52" },
+  { id: "19501951", label: "1950-51" },
+];
+
+// Reactive state
+const selectedSeasons = ref<Season[] | null>([]);
+
+// Event handlers
+const onSeasonSelect = (season: Season, selected: boolean) => {
+  console.log('Season selected:', season, selected);
+}
+const onSeasonSelectAll = (seasons: Season[]) => {
+  console.log('Seasons all selected:', seasons.length);
+}
+const onSeasonClearAll = () => {
+  console.log('Seasons all cleared:');
 }
 
 // Game type selections
@@ -44,7 +89,7 @@ interface GameType {
 const gameTypes: GameType[] = [
   { id: "regular", label: "Regular Season" },
   { id: "playoff", label: "Playoffs" },
-  { id: "combined", label: "Combined" },
+  { id: "combined", label: "Combined" }, // Exclusive
 ];
 
 // Reactive state
@@ -55,10 +100,10 @@ const onGameTypeSelect = (gameType: GameType, selected: boolean) => {
   console.log('Game type selected:', gameType, selected);
 }
 const onGameTypeSelectAll = (gameTypes: GameType[]) => {
-  console.log('Game type all selected:', gameTypes.length);
+  console.log('Game types all selected:', gameTypes.length);
 }
 const onGameTypeClearAll = () => {
-  console.log('Game type all cleared:');
+  console.log('Game types all cleared:');
 }
 
 // Team selections
@@ -67,17 +112,24 @@ interface FranchiseTeam {
   label: string;
 }
 const franchiseTeams: FranchiseTeam[] = [
-  { id: "ana", label: "Anaheim Ducks" },
-  { id: "bos", label: "Boston Bruins" },
-  { id: "buf", label: "Buffalo Sabres" },
-  { id: "cal", label: "Calgary Flames" },
-  { id: "car", label: "Carolina Hurricanes" },
-  { id: "chi", label: "Chicago Blackhawks" },
-  { id: "cor", label: "Colorado Avalanche" },
-  { id: "col", label: "Columbus Blue Jackets" },
-  { id: "das", label: "Dallas Stars" },
-  { id: "det", label: "Detroit Red Wings" },
-  { id: "edm", label: "Edmonton Oilers" },
+  { id: "ANA", label: "Anaheim Ducks" },
+  { id: "BOS", label: "Boston Bruins" },
+  { id: "BUF", label: "Buffalo Sabres" },
+  { id: "CGY", label: "Calgary Flames" },
+  { id: "CAR", label: "Carolina Hurricanes" },
+  { id: "CHI", label: "Chicago Blackhawks" },
+  { id: "COL", label: "Colorado Avalanche" },
+  { id: "CBJ", label: "Columbus Blue Jackets" },
+  { id: "DAS", label: "Dallas Stars" },
+  { id: "DET", label: "Detroit Red Wings" },
+  { id: "EDM", label: "Edmonton Oilers" },
+  { id: "MIN", label: "Minnesota Wild" },
+  { id: "NJD", label: "New Jersey Devils" },
+  { id: "PIT", label: "Pittsburgh Penguins" },
+  { id: "SEA", label: "Seattle Kraken" },
+  { id: "TBL", label: "Tampa Bay Lightning" },
+  { id: "WSH", label: "Washington Capitals" },
+  { id: "WPG", label: "Winnipeg Jets" },
 ];
 
 // Reactive state
@@ -94,6 +146,33 @@ const onTeamClearAll = () => {
   console.log('Teams all cleared:');
 }
 
+
+// Team selections
+interface Player {
+  id: string;
+  fullName: string;
+  teamId: string;
+  jersey: number;
+  position: string
+}
+const players: Player[] = [
+  { id: "NHL-8478402", fullName: "Connor McDavid", teamId: "EDM", jersey: 97, position: "C" },
+  { id: "NHL-8477956", fullName: "David Pastrnak", teamId: "BOS", jersey: 88, position: "RW" },
+  { id: "NHL-8477492", fullName: "Nathan MacKinnon", teamId: "COL", jersey: 29, position: "C" },
+  { id: "NHL-8477934", fullName: "Leon Draisaitl", teamId: "EDM", jersey: 29, position: "C" },
+  { id: "NHL-8479318", fullName: "Auston Matthews", teamId: "TOR", jersey: 34, position: "C" },
+  { id: "NHL-8474578", fullName: "Erik Karlsson", teamId: "PIT", jersey: 65, position: "D" },
+  { id: "NHL-8476453", fullName: "Nikita Kucherov", teamId: "TBL", jersey: 86, position: "RW" },
+  { id: "NHL-8471675", fullName: "Sidney Crosby", teamId: "PIT", jersey: 87, position: "C" },
+  { id: "NHL-8471214", fullName: "Alex Ovechkin", teamId: "WSH", jersey: 8, position: "LW" },
+  { id: "NHL-8476945", fullName: "Connor Hellebuyck", teamId: "WPG", jersey: 37, position: "G" },
+  { id: "NHL-8480069", fullName: "Cale Makar", teamId: "COL", jersey: 8, position: "D" },
+  { id: "NHL-8477919", fullName: "Frederick Gaudreau", teamId: "SEA", jersey: 89, position: "C" },
+  { id: "NHL-8478427", fullName: "Sebastian Aho", teamId: "CAR", jersey: 20, position: "C" },
+  { id: "NHL-8478864", fullName: "Kirill Kaprizov", teamId: "MIN", jersey: 97, position: "LW" },
+  { id: "NHL-8481559", fullName: "Jack Hughes", teamId: "NJD", jersey: 86, position: "C" },
+];
+
 // Set default selections
 import { onMounted } from 'vue';
 onMounted(() => {
@@ -101,7 +180,7 @@ onMounted(() => {
   // selectedReportType.value = reportTypes[0];
 
   // Default to the "All" team
-  selectedTeams.value = franchiseTeams ?? [franchiseTeams[0]];
+  // selectedTeams.value = franchiseTeams ?? [franchiseTeams[0]];
 });
 </script>
 
@@ -160,112 +239,109 @@ onMounted(() => {
 
     <!-- Single selection field, limited to 5 rows, label -->
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <span class="p-2 pt-4 text-xs text-blue-500">Single selection field, 3 rows. Verical aligned label.</span>
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="reportType">Report Type</Label>
-        <SingleSelect
-          v-model = "selectedReportType"
+        <MultiSelect
+          :v-model = "selectedReportTypes"
           :items = "reportTypes"
           valueKey = "id"
           labelKey = "label"
           placeholder = "Select report ..."
-          searchPlaceholder = "Search reports ..."
-          emptyStateText = "No report found."
+          searchPlaceholder = "Search report types ..."
+          emptyStateText = "No report types found."
           groupHeading = "Report Types"
+          :maxSelections = 1
           listClass = "max-h-[168px] overflow-y-auto""
-          @select = "onReportSelect"
+          :showSelectAll = false
+          :showFooter = false
+          @select = "onReportTypeSelect"
+          @selectAll = "onReportTypeSelectAll"
+          @clearAll = "onReportTypeClearAll"
         />
       </div>
       <div class="p-2 text-xs text-gray-500">
-        Selected report type: {{ selectedReportType?.id }}, name: {{ selectedReportType?.label }}
+        Selected report types: {{ selectedReportTypes?.map(r => r.id).join(', ') }}
+          ; names: {{ selectedReportTypes?.map(r => r.label).join(', ') }}
       </div>
     </div>
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <span class="p-2 pt-4 text-xs text-blue-500">Multiple selection field. Verical aligned label.</span>
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
-        <Label for="reportType">Game Type</Label>
+        <Label for="reportType">Game Types</Label>
         <MultiSelect
-          v-model = "selectedGameTypes"
+          :v-model = "selectedGameTypes"
           :items = "gameTypes"
           valueKey = "id"
           labelKey = "label"
           placeholder = "Select game types ..."
           searchPlaceholder = "Search game types ..."
           emptyStateText = "No game types found."
-          groupHeading = "Game typess"
-          @select = "onTeamSelect"
+          groupHeading = "Game types"
+          :exclusiveValues = "['combined']"
+          :maxBadges = 2
+          :showSelectAll = false
+          :showFooter = false
+          @select = "onGameTypeSelect"
           @selectAll = "onGameTypeSelectAll"
           @clearAll = "onGameTypeClearAll"
         />
       </div>
       <div class="p-2 text-xs text-gray-500">
-        <div v-for="type in selectedGameTypes">
-          Selected type: {{ type?.id }}, name: {{ type?.label }}
-        </div>
+        Selected game types: {{ selectedGameTypes?.map(r => r.id).join(', ') }}
+          ; names: {{ selectedGameTypes?.map(r => r.label).join(', ') }}
       </div>
     </div>
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <span class="p-2 pt-4 text-xs text-blue-500">Multiple selection field. Verical aligned label.</span>
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
-        <Label for="reportType">Select Team</Label>
+        <Label for="reportType">Seasons</Label>
         <MultiSelect
-          v-model = "selectedTeams"
+          :v-model = "selectedSeasons"
+          :items = "seasons"
+          valueKey = "id"
+          labelKey = "label"
+          placeholder = "Select season ..."
+          searchPlaceholder = "Search seasons ..."
+          emptyStateText = "No seasons found."
+          groupHeading = "Seasons"
+          :maxBadges = 2
+          :showFooter = false
+          @select = "onSeasonSelect"
+          @selectAll = "onSeasonSelectAll"
+          @clearAll = "onSeasonClearAll"
+        />
+      </div>
+      <div class="p-2 text-xs text-gray-500">
+        Selected seasons: {{ selectedSeasons?.map(r => r.id).join(', ') }}
+          ; names: {{ selectedSeasons?.map(r => r.label).join(', ') }}
+      </div>
+    </div>
+
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
+        <Label for="reportType">Select Teams</Label>
+        <MultiSelect
+          :v-model = "selectedTeams"
           :items = "franchiseTeams"
           valueKey = "id"
           labelKey = "label"
+          badgeKey = "id"
           placeholder = "Select teams ..."
           searchPlaceholder = "Search teams ..."
           emptyStateText = "No teams found."
           groupHeading = "Franchise Teams"
+          :maxBadges = 2
+          :showFooter = false
           @select = "onTeamSelect"
           @selectAll = "onTeamSelectAll"
           @clearAll = "onTeamClearAll"
         />
       </div>
       <div class="p-2 text-xs text-gray-500">
-        <div v-for="team in selectedTeams">
-          Selected team: {{ team?.id }}, name: {{ team?.label }}
-        </div>
+        Selected teams: {{ selectedTeams?.map(t => t.id).join(', ') }}
+          ; names: {{ selectedTeams?.map(t => t.label).join(', ') }}
       </div>
     </div>
-
-    <!-- Multi selection field, checkbox indicator, label -->
-    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <span class="p-2 pt-4 text-xs text-blue-500">Multi select selection field. Verical aligned label.</span>
-      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
-        <Label for="franchiseTeam">Team</Label>
-        <MultiSelect></MultiSelect>
-      </div>
-      div class="p-2 text-xs text-gray-500">
-        Selected team: {{ selectedTeam }}
-      </div>
-    </div> -->
-
-    <!-- Single combo selection field, label -->
-    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <span class="p-2 pt-4 text-xs text-blue-500">Single combo selection field. Verical aligned label.</span>
-      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
-        <Label for="franchiseTeam">Team</Label>
-        <SingleCombo></SingleCombo>
-      </div>
-      div class="p-2 text-xs text-gray-500">
-        Selected team: {{ selectedTeam }}
-      </div>
-    </div> -->
-
-    <!-- Multi combo selection field, checkbox indicator, label -->
-    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <span class="p-2 pt-4 text-xs text-blue-500">Single combo selection field. Verical aligned label.</span>
-      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
-        <Label for="franchiseTeam">Team</Label>
-        <MultiCombo></MultiCombo>
-      </div>
-      div class="p-2 text-xs text-gray-500">
-        Selected team: {{ selectedTeam }}
-      </div>
-    </div> -->
 
     <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
       <span class="p-2 pt-4 text-xs text-blue-500">Form component with validated input field.</span>
@@ -273,12 +349,6 @@ onMounted(() => {
       </SimpleForm>
     </div> -->
 
-    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <span class="p-2 pt-4 text-xs text-blue-500">Data table.</span>
-      <div class="p-2">
-        Stuff
-      </div>
-    </div> -->
 
   </div>
 

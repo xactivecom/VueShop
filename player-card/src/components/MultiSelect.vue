@@ -1,14 +1,13 @@
 <script setup lang="ts" generic="T">
-import { ref, computed, watch } from "vue";
+import { ref, type Ref, computed, watch } from "vue";
 import { Button } from "@/components/ui/button";
-import { Badge } from '@/components/ui/badge';
+import { Badge } from "@/components/ui/badge";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  // CommandLabel,
   CommandList,
 } from "@/components/ui/command";
 import {
@@ -21,6 +20,9 @@ import { Check, ChevronDown, X, Minus } from "lucide-vue-next";
 // Properties interface
 interface Props<T> {
   items: T[];
+  valueKey: keyof T;
+  labelKey: keyof T;
+  badgeKey?: keyof T;
   placeholder?: string;
   searchPlaceholder?: string;
   emptyStateText?: string;
@@ -28,20 +30,18 @@ interface Props<T> {
   buttonClass?: string;
   popoverClass?: string;
   listClass?: string;
-
+  maxSelections?: number;
   maxBadges?: number;
   showSelectAll?: boolean;
   showFooter?: boolean;
   showSelectedItems?: boolean;
   selectedItemsLabel?: string;
   selectedCountText?: string;
-
   footerText?: string;
   selectAllText?: string;
   clearAllText?: string;
-  valueKey: keyof T;
-  labelKey: keyof T;
-
+  exclusiveValues?: string[];
+  exclusiveKey?: keyof T;
   modelValue?: T[];
 }
 
@@ -55,55 +55,60 @@ const props = withDefaults(defineProps<Props<T>>(), {
   buttonClass: "w-[300px] justify-between",
   popoverClass: "w-[300px] p-0",
   listClass: "max-h-[256px] overflow-y-auto",
-
+  maxSelections: undefined,
   maxBadges: 3,
   showSelectAll: true,
   showFooter: true,
   showSelectedItems: false,
-  selectedItemsLabel: 'Selected Items',
-  selectedCountText: 'items selected',
-
-  footerText: 'items',
-  selectAllText: 'Select All',
-  clearAllText: 'Clear All',
-
-  modelValue: () => [] as T[],
+  selectedItemsLabel: "Selected Items",
+  selectedCountText: "items selected",
+  footerText: "items",
+  selectAllText: "Select All",
+  clearAllText: "Clear All",
+  exclusiveValues: () => [],
+  exclusiveKey: undefined,
+  modelValue: () => [],
 });
 
 // Define emits
 const emit = defineEmits<{
-  'update:modelValue': [value: T[]]
-  'select': [item: T, selected: boolean]
-  'selectAll': [items: T[]]
-  'clearAll': []
+  "update:modelValue": [value: T[]]
+  "select": [item: T, selected: boolean]
+  "selectAll": [items: T[]]
+  "clearAll": []
+  "maxSelectionsReached": [maxSelections: number]
 }>();
 
 // Reactive state
-const open = ref(false)
-const searchValue = ref('')
-const selectedItems = ref<T[]>([...props.modelValue])
-const selectAllValue = '__select_all__'
+const open = ref(false);
+const searchValue = ref("");
+const selectedItems = ref<T[]>([...props.modelValue]) as Ref<T[]>;
+const selectAllValue = "__select_all__";
 
 // Computed properties
 const filteredItems = computed(() => {
-  if (!searchValue.value) return props.items
-  
+  if (!searchValue.value) return props.items;
   return props.items.filter(item =>
     getItemLabel(item)
       .toLowerCase()
       .includes(searchValue.value.toLowerCase())
-  )
+  );
 });
 
 // Helper functions
 const getItemValue = (item: T): string => {
-  const value = item[props.valueKey]
-  return typeof value === 'string' ? value : String(value)
+  const value = item[props.valueKey];
+  return typeof value === "string" ? value : String(value);
 };
 
 const getItemLabel = (item: T): string => {
-  const label = item[props.labelKey]
-  return typeof label === 'string' ? label : String(label)
+  const label = item[props.labelKey];
+  return typeof label === "string" ? label : String(label);
+};
+
+const getItemBadge = (item: T): string => {
+  const label = item[props?.badgeKey ? props?.badgeKey : props.labelKey];
+  return typeof label === "string" ? label : String(label);
 };
 
 const isItemSelected = (item: T): boolean => {
@@ -112,34 +117,95 @@ const isItemSelected = (item: T): boolean => {
   );
 };
 
-const toggleItem = (item: T) => {
-  const index = selectedItems.value.findIndex(selected => 
-    getItemValue(selected) === getItemValue(item)
-  );
-  
-  if (index >= 0) {
-    // Remove item
-    selectedItems.value.splice(index, 1);
-    emit('select', item, false);
-  } else {
-    // Add item
-    selectedItems.value.push(item);
-    emit('select', item, true);
+const isExclusiveItem = (item: T): boolean => {
+  if (!props.exclusiveValues || props.exclusiveValues.length === 0) {
+    return false;
+  }
+  const checkKey = props.exclusiveKey || props.valueKey;
+  const itemValue = item[checkKey];
+  const valueStr = typeof itemValue === "string" ? itemValue : String(itemValue);
+  return props.exclusiveValues.includes(valueStr);
+};
+
+const hasExclusiveSelection = (): boolean => {
+  return selectedItems.value.some(item => isExclusiveItem(item));
+};
+
+const isMaxSelectionsReached = (): boolean => {
+  return props.maxSelections !== undefined && 
+    selectedItems.value.length >= props.maxSelections;
+};
+
+const canSelectItem = (item: T): boolean => {
+  // If item is already selected, can always deselect
+  if (isItemSelected(item)) {
+    return true;
   }
   
-  emit('update:modelValue', [...selectedItems.value]);
+  // Check if max selections reached
+  if (isMaxSelectionsReached()) {
+    // Can still select if it's an exclusive item (which will clear others)
+    return isExclusiveItem(item);
+  }  
+  return true;
+};
+
+const toggleItem = (item: T) => {
+  const itemValue = getItemValue(item);
+  const isCurrentlySelected = isItemSelected(item);
+  const isExclusive = isExclusiveItem(item);
+  
+  if (isCurrentlySelected) {
+    // Remove item - standard behavior
+    const index = selectedItems.value.findIndex(selected => 
+      getItemValue(selected) === itemValue
+    );
+    if (index >= 0) {
+      selectedItems.value.splice(index, 1);
+    }
+    emit("select", item, false);
+  } else {
+    // Adding item
+    if (isExclusive) {
+      // This is an exclusive item - clear all others and add only this one
+      selectedItems.value = [item];
+      emit("select", item, true);
+    } else {
+      // Regular item - check if exclusive items are selected
+      if (hasExclusiveSelection()) {
+        // Remove all exclusive items first
+        selectedItems.value = selectedItems.value.filter(selected => 
+          !isExclusiveItem(selected)
+        )
+      }
+
+      // Add the new item
+      selectedItems.value.push(item);
+      emit("select", item, true);
+    }
+  }
+  
+  emit("update:modelValue", [...selectedItems.value]);
 };
 
 const selectAllItems = () => {
-  selectedItems.value = [...props.items];
-  emit('update:modelValue', [...selectedItems.value]);
-  emit('selectAll', [...selectedItems.value]);
+  // Respect max selections if set
+  if (props.maxSelections !== undefined) {
+    selectedItems.value = [...props.items.slice(0, props.maxSelections)];
+    if (props.items.length > props.maxSelections) {
+      emit("maxSelectionsReached", props.maxSelections);
+    }
+  } else {
+    selectedItems.value = [...props.items];
+  }
+  emit("update:modelValue", [...selectedItems.value]);
+  emit("selectAll", [...selectedItems.value]);
 };
 
 const clearAllSelections = () => {
   selectedItems.value = [];
-  emit('update:modelValue', []);
-  emit('clearAll');
+  emit("update:modelValue", []);
+  emit("clearAll");
 };
 
 const toggleSelectAll = () => {
@@ -158,7 +224,7 @@ const toggleSelectAll = () => {
     });
   }
   
-  emit('update:modelValue', [...selectedItems.value]);
+  emit("update:modelValue", [...selectedItems.value]);
 };
 
 const getSelectAllText = (): string => {
@@ -170,15 +236,16 @@ const getSelectAllText = (): string => {
     return `${selectedItems.value.length}/${props.items.length} selected`;
   }
 };
+
 // Watch for external modelValue changes
 watch(() => props.modelValue, (newValue) => {
   selectedItems.value = [...newValue]
 }, { deep: true });
 
 // Prevent dropdown from closing on selection
-const handleSelectInteraction = () => {
+// const handleSelectInteraction = () => {
   // Keep dropdown open for multi-select
-}
+// }
 </script>
 
 <template>
@@ -207,7 +274,7 @@ const handleSelectInteraction = () => {
               variant="secondary"
               class="text-xs"
             >
-              {{ getItemLabel(item) }}
+              {{ getItemBadge(item) }}
               <button
                 @click.stop="toggleItem(item)"
                 class="ml-1 hover:text-red-500"
@@ -263,7 +330,11 @@ const handleSelectInteraction = () => {
               :key="getItemValue(item)"
               :value="getItemValue(item)"
               @select="toggleItem(item)"
-              class="cursor-pointer"
+              :class="[
+                'cursor-pointer',
+                !canSelectItem(item) && !isItemSelected(item) ? 'opacity-50' : ''
+              ]"
+              :disabled="!canSelectItem(item) && !isItemSelected(item)"
             >
               <div class="flex items-center space-x-2 w-full">
                 <!-- Checkbox indicator -->
