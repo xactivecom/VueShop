@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 // import { Search } from "lucide-vue-next"; // Search icon
 
 import MultiSelect from "@/components/MultiSelect.vue";
+import MultiSelectGrid from "@/components/MultiSelectGrid.vue";
 
 // Search model for activeOnly checkbox
 const isActiveOnly = ref(true);
@@ -30,13 +31,13 @@ const selectedReportTypes = ref<ReportType[] | null>([]);
 
 // Event handlers
 const onReportTypeSelect = (reportType: ReportType, selected: boolean) => {
-  console.log('Report type selected:', reportType, selected);
+  console.log("Report type selected:", reportType, selected);
 }
 const onReportTypeSelectAll = (reportTypes: ReportType[]) => {
-  console.log('Report types all selected:', reportTypes.length);
+  console.log("Report types all selected:", reportTypes.length);
 }
 const onReportTypeClearAll = () => {
-  console.log('Report types all cleared:');
+  console.log("Report types all cleared:");
 }
 
 // Season selections
@@ -72,13 +73,13 @@ const selectedSeasons = ref<Season[] | null>([]);
 
 // Event handlers
 const onSeasonSelect = (season: Season, selected: boolean) => {
-  console.log('Season selected:', season, selected);
+  console.log("Season selected:", season, selected);
 }
 const onSeasonSelectAll = (seasons: Season[]) => {
-  console.log('Seasons all selected:', seasons.length);
+  console.log("Seasons all selected:", seasons.length);
 }
 const onSeasonClearAll = () => {
-  console.log('Seasons all cleared:');
+  console.log("Seasons all cleared:");
 }
 
 // Game type selections
@@ -97,13 +98,13 @@ const selectedGameTypes = ref<GameType[] | null>([]);
 
 // Event handlers
 const onGameTypeSelect = (gameType: GameType, selected: boolean) => {
-  console.log('Game type selected:', gameType, selected);
+  console.log("Game type selected:", gameType, selected);
 }
 const onGameTypeSelectAll = (gameTypes: GameType[]) => {
-  console.log('Game types all selected:', gameTypes.length);
+  console.log("Game types all selected:", gameTypes.length);
 }
 const onGameTypeClearAll = () => {
-  console.log('Game types all cleared:');
+  console.log("Game types all cleared:");
 }
 
 // Team selections
@@ -137,13 +138,13 @@ const selectedTeams = ref<FranchiseTeam[] | null>([]);
 
 // Event handlers
 const onTeamSelect = (team: FranchiseTeam, selected: boolean) => {
-  console.log('Team selected:', team, selected);
+  console.log("Team selected:", team, selected);
 }
 const onTeamSelectAll = (teams: FranchiseTeam[]) => {
-  console.log('Teams all selected:', teams.length);
+  console.log("Teams all selected:", teams.length);
 }
 const onTeamClearAll = () => {
-  console.log('Teams all cleared:');
+  console.log("Teams all cleared:");
 }
 
 
@@ -173,8 +174,16 @@ const players: Player[] = [
   { id: "NHL-8481559", fullName: "Jack Hughes", teamId: "NJD", jersey: 86, position: "C" },
 ];
 
+const selectedPlayers = ref<Set<string>>(new Set());
+
+const playerColumns = [
+  { key: "fullName", label: "Name", width: 4 },
+  { key: "teamId", label: "Team", width: 2 },
+  { key: "jersey", label: "Jersey", width: 2, format: (val: number) => `#${val}` },
+  { key: "position", label: "Position", width: 3 },
+];
+
 // Set default selections
-import { onMounted } from 'vue';
 onMounted(() => {
   // Default to the first report type
   // selectedReportType.value = reportTypes[0];
@@ -260,8 +269,8 @@ onMounted(() => {
         />
       </div>
       <div class="p-2 text-xs text-gray-500">
-        Selected report types: {{ selectedReportTypes?.map(r => r.id).join(', ') }}
-          ; names: {{ selectedReportTypes?.map(r => r.label).join(', ') }}
+        Selected report types: {{ selectedReportTypes?.map(r => r.id).join(", ") }}
+          ; names: {{ selectedReportTypes?.map(r => r.label).join(", ") }}
       </div>
     </div>
 
@@ -287,8 +296,8 @@ onMounted(() => {
         />
       </div>
       <div class="p-2 text-xs text-gray-500">
-        Selected game types: {{ selectedGameTypes?.map(r => r.id).join(', ') }}
-          ; names: {{ selectedGameTypes?.map(r => r.label).join(', ') }}
+        Selected game types: {{ selectedGameTypes?.map(r => r.id).join(", ") }}
+          ; names: {{ selectedGameTypes?.map(r => r.label).join(", ") }}
       </div>
     </div>
 
@@ -312,8 +321,8 @@ onMounted(() => {
         />
       </div>
       <div class="p-2 text-xs text-gray-500">
-        Selected seasons: {{ selectedSeasons?.map(r => r.id).join(', ') }}
-          ; names: {{ selectedSeasons?.map(r => r.label).join(', ') }}
+        Selected seasons: {{ selectedSeasons?.map(r => r.id).join(", ") }}
+          ; names: {{ selectedSeasons?.map(r => r.label).join(", ") }}
       </div>
     </div>
 
@@ -338,9 +347,28 @@ onMounted(() => {
         />
       </div>
       <div class="p-2 text-xs text-gray-500">
-        Selected teams: {{ selectedTeams?.map(t => t.id).join(', ') }}
-          ; names: {{ selectedTeams?.map(t => t.label).join(', ') }}
+        Selected teams: {{ selectedTeams?.map(t => t.id).join(", ") }}
+          ; names: {{ selectedTeams?.map(t => t.label).join(", ") }}
       </div>
+    </div>
+
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
+        <Label for="reportType">Select Players</Label>
+        <MultiSelectGrid
+          :v-model = "selectedPlayers"
+          :items = "players"
+          :columns = "playerColumns"
+          idKey = "id"
+          displayKey = "fullName"
+          placeholder = "Select players ..."
+          searchPlaceholder = "Search players by name, etc ..."
+          emptyStateText = "No matchine players found."
+        />
+      </div>
+      <!-- <div class="p-2 text-xs text-gray-500">
+        Selected players: {{ selectedPlayers?.forEach(p => p).join(", ") }}
+      </div> -->
     </div>
 
     <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">

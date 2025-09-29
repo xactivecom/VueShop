@@ -49,7 +49,7 @@ interface Props<T> {
 // listClass: height 36px + (5 items * 44px)
 const props = withDefaults(defineProps<Props<T>>(), {
   placeholder: "Select item...",
-  searchPlaceholder: "Search items...",
+  searchPlaceholder: "Search items ...",
   emptyStateText: "No items found.",
   groupHeading: "Items",
   buttonClass: "w-[300px] justify-between",
