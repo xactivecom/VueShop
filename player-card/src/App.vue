@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 // import { Search } from "lucide-vue-next"; // Search icon
 
 import MultiSelect from "@/components/MultiSelect.vue";
-import MultiSelectGrid from "@/components/MultiSelectGrid.vue";
+import MultiSelectGrid, { type ColumnConfig } from "@/components/MultiSelectGrid.vue";
 
 // Search model for activeOnly checkbox
 const isActiveOnly = ref(true);
@@ -27,7 +27,7 @@ const reportTypes: ReportType[] = [
 ];
 
 // Reactive state
-const selectedReportTypes = ref<ReportType[] | null>([]);
+const selectedReportTypes = ref<ReportType[]>([]);
 
 // Event handlers
 const onReportTypeSelect = (reportType: ReportType, selected: boolean) => {
@@ -39,6 +39,33 @@ const onReportTypeSelectAll = (reportTypes: ReportType[]) => {
 const onReportTypeClearAll = () => {
   console.log("Report types all cleared:");
 }
+
+
+// Game type selections
+interface GameType {
+  id: String;
+  label: string;
+}
+const gameTypes: GameType[] = [
+  { id: "regular", label: "Regular Season" },
+  { id: "playoff", label: "Playoffs" },
+  { id: "combined", label: "Combined" }, // Exclusive
+];
+
+// Reactive state
+const selectedGameTypes = ref<GameType[]>([]);
+
+// Event handlers
+const onGameTypeSelect = (gameType: GameType, selected: boolean) => {
+  console.log("Game type selected:", gameType, selected);
+}
+const onGameTypeSelectAll = (gameTypes: GameType[]) => {
+  console.log("Game types all selected:", gameTypes.length);
+}
+const onGameTypeClearAll = () => {
+  console.log("Game types all cleared:");
+}
+
 
 // Season selections
 interface Season {
@@ -69,7 +96,7 @@ const seasons: Season[] = [
 ];
 
 // Reactive state
-const selectedSeasons = ref<Season[] | null>([]);
+const selectedSeasons = ref<Season[]>([]);
 
 // Event handlers
 const onSeasonSelect = (season: Season, selected: boolean) => {
@@ -82,30 +109,6 @@ const onSeasonClearAll = () => {
   console.log("Seasons all cleared:");
 }
 
-// Game type selections
-interface GameType {
-  id: String;
-  label: string;
-}
-const gameTypes: GameType[] = [
-  { id: "regular", label: "Regular Season" },
-  { id: "playoff", label: "Playoffs" },
-  { id: "combined", label: "Combined" }, // Exclusive
-];
-
-// Reactive state
-const selectedGameTypes = ref<GameType[] | null>([]);
-
-// Event handlers
-const onGameTypeSelect = (gameType: GameType, selected: boolean) => {
-  console.log("Game type selected:", gameType, selected);
-}
-const onGameTypeSelectAll = (gameTypes: GameType[]) => {
-  console.log("Game types all selected:", gameTypes.length);
-}
-const onGameTypeClearAll = () => {
-  console.log("Game types all cleared:");
-}
 
 // Team selections
 interface FranchiseTeam {
@@ -134,7 +137,7 @@ const franchiseTeams: FranchiseTeam[] = [
 ];
 
 // Reactive state
-const selectedTeams = ref<FranchiseTeam[] | null>([]);
+const selectedTeams = ref<FranchiseTeam[]>([]);
 
 // Event handlers
 const onTeamSelect = (team: FranchiseTeam, selected: boolean) => {
@@ -176,11 +179,11 @@ const players: Player[] = [
 
 const selectedPlayers = ref<Set<string>>(new Set());
 
-const playerColumns = [
+const playerColumns: ColumnConfig<Player>[] = [
   { key: "fullName", label: "Name", width: 4 },
   { key: "teamId", label: "Team", width: 2 },
   { key: "jersey", label: "Jersey", width: 2, format: (val: number) => `#${val}` },
-  { key: "position", label: "Position", width: 3 },
+  { key: "position", label: "Position", width: 1 },
 ];
 
 // Set default selections
@@ -251,7 +254,7 @@ onMounted(() => {
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="reportType">Report Type</Label>
         <MultiSelect
-          :v-model = "selectedReportTypes"
+          v-model = "selectedReportTypes"
           :items = "reportTypes"
           valueKey = "id"
           labelKey = "label"
@@ -260,6 +263,8 @@ onMounted(() => {
           emptyStateText = "No report types found."
           groupHeading = "Report Types"
           :maxSelections = 1
+          buttonClass = "w-[180px] justify-between"
+          popoverClass = "w-[180px] p-0"
           listClass = "max-h-[168px] overflow-y-auto""
           :showSelectAll = false
           :showFooter = false
@@ -278,7 +283,7 @@ onMounted(() => {
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="reportType">Game Types</Label>
         <MultiSelect
-          :v-model = "selectedGameTypes"
+          v-model = "selectedGameTypes"
           :items = "gameTypes"
           valueKey = "id"
           labelKey = "label"
@@ -287,7 +292,9 @@ onMounted(() => {
           emptyStateText = "No game types found."
           groupHeading = "Game types"
           :exclusiveValues = "['combined']"
-          :maxBadges = 2
+          :maxBadges = 1
+          buttonClass = "w-[180px] justify-between"
+          popoverClass = "w-[180px] p-0"
           :showSelectAll = false
           :showFooter = false
           @select = "onGameTypeSelect"
@@ -305,15 +312,17 @@ onMounted(() => {
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="reportType">Seasons</Label>
         <MultiSelect
-          :v-model = "selectedSeasons"
+          v-model = "selectedSeasons"
           :items = "seasons"
           valueKey = "id"
           labelKey = "label"
-          placeholder = "Select season ..."
+          placeholder = "Select seasons ..."
           searchPlaceholder = "Search seasons ..."
           emptyStateText = "No seasons found."
           groupHeading = "Seasons"
-          :maxBadges = 2
+          :maxBadges = 1
+          buttonClass = "w-[180px] justify-between"
+          popoverClass = "w-[180px] p-0"
           :showFooter = false
           @select = "onSeasonSelect"
           @selectAll = "onSeasonSelectAll"
@@ -330,7 +339,7 @@ onMounted(() => {
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="reportType">Select Teams</Label>
         <MultiSelect
-          :v-model = "selectedTeams"
+          v-model = "selectedTeams"
           :items = "franchiseTeams"
           valueKey = "id"
           labelKey = "label"
@@ -340,6 +349,8 @@ onMounted(() => {
           emptyStateText = "No teams found."
           groupHeading = "Franchise Teams"
           :maxBadges = 2
+          buttonClass = "w-[200px] justify-between"
+          popoverClass = "w-[240px] p-0"
           :showFooter = false
           @select = "onTeamSelect"
           @selectAll = "onTeamSelectAll"
@@ -356,14 +367,14 @@ onMounted(() => {
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="reportType">Select Players</Label>
         <MultiSelectGrid
-          :v-model = "selectedPlayers"
+          v-model = "selectedPlayers"
           :items = "players"
           :columns = "playerColumns"
           idKey = "id"
           displayKey = "fullName"
           placeholder = "Select players ..."
-          searchPlaceholder = "Search players by name, etc ..."
-          emptyStateText = "No matchine players found."
+          searchPlaceholder = "Search players by name, team ..."
+          emptyStateText = "No matching players found."
         />
       </div>
       <!-- <div class="p-2 text-xs text-gray-500">

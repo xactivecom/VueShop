@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T extends Record<string, any>">
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -16,7 +16,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-interface ColumnConfig<T> {
+export interface ColumnConfig<T> {
   key: keyof T;
   label: string;
   width?: number; // Column width in grid units (1-12)
