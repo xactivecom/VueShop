@@ -34,8 +34,6 @@ interface Props<T> {
   maxBadges?: number;
   showSelectAll?: boolean;
   showFooter?: boolean;
-  showSelectedItems?: boolean;
-  selectedItemsLabel?: string;
   selectedCountText?: string;
   footerText?: string;
   selectAllText?: string;
@@ -52,15 +50,13 @@ const props = withDefaults(defineProps<Props<T>>(), {
   searchPlaceholder: "Search items ...",
   emptyStateText: "No items found.",
   groupHeading: "Items",
-  buttonClass: "w-[300px] justify-between",
-  popoverClass: "w-[300px] p-0",
-  listClass: "max-h-[256px] overflow-y-auto",
+  buttonClass: "w-full justify-between",
+  popoverClass: "w-full p-0",
+  listClass: "max-h-[256px] overflow-y-auto", // approx 5 items
   maxSelections: undefined,
-  maxBadges: 3,
+  maxBadges: 2,
   showSelectAll: true,
   showFooter: true,
-  showSelectedItems: false,
-  selectedItemsLabel: "Selected Items",
   selectedCountText: "items selected",
   footerText: "items",
   selectAllText: "Select All",
@@ -88,10 +84,13 @@ const selectAllValue = "__select_all__";
 // Computed properties
 const filteredItems = computed(() => {
   if (!searchValue.value) return props.items;
+
+  // Filter on searchValue appearing in item label
+  const query = searchValue.value.toLowerCase();
   return props.items.filter(item =>
     getItemLabel(item)
       .toLowerCase()
-      .includes(searchValue.value.toLowerCase())
+      .includes(query)
   );
 });
 
@@ -184,29 +183,28 @@ const toggleItem = (item: T) => {
       emit("select", item, true);
     }
   }
-  
   emit("update:modelValue", [...selectedItems.value]);
 };
 
-const selectAllItems = () => {
-  // Respect max selections if set
-  if (props.maxSelections !== undefined) {
-    selectedItems.value = [...props.items.slice(0, props.maxSelections)];
-    if (props.items.length > props.maxSelections) {
-      emit("maxSelectionsReached", props.maxSelections);
-    }
-  } else {
-    selectedItems.value = [...props.items];
-  }
-  emit("update:modelValue", [...selectedItems.value]);
-  emit("selectAll", [...selectedItems.value]);
-};
+// const selectAllItems = () => {
+//   // Respect max selections if set
+//   if (props.maxSelections !== undefined) {
+//     selectedItems.value = [...props.items.slice(0, props.maxSelections)];
+//     if (props.items.length > props.maxSelections) {
+//       emit("maxSelectionsReached", props.maxSelections);
+//     }
+//   } else {
+//     selectedItems.value = [...props.items];
+//   }
+//   emit("update:modelValue", [...selectedItems.value]);
+//   emit("selectAll", [...selectedItems.value]);
+// };
 
-const clearAllSelections = () => {
-  selectedItems.value = [];
-  emit("update:modelValue", []);
-  emit("clearAll");
-};
+// const clearAllSelections = () => {
+//   selectedItems.value = [];
+//   emit("update:modelValue", []);
+//   emit("clearAll");
+// };
 
 const toggleSelectAll = () => {
   if (selectedItems.value.length === filteredItems.value.length && filteredItems.value.length > 0) {
@@ -237,6 +235,11 @@ const getSelectAllText = (): string => {
   }
 };
 
+const openPopover = () => {
+  // Clear previous search value
+  searchValue.value = "";
+};
+
 // Watch for external modelValue changes
 watch(() => props.modelValue, (newValue) => {
   selectedItems.value = [...newValue]
@@ -244,12 +247,12 @@ watch(() => props.modelValue, (newValue) => {
 
 // Prevent dropdown from closing on selection
 // const handleSelectInteraction = () => {
-  // Keep dropdown open for multi-select
+  // Can keep popover open by setting: open.value = false
 // }
 </script>
 
 <template>
-  <Popover v-model:open="open">
+  <Popover v-model:open="open" @update:open="openPopover">
     <PopoverTrigger as-child>
       <Button
         variant="outline"
@@ -268,6 +271,7 @@ watch(() => props.modelValue, (newValue) => {
             v-else-if="selectedItems.length <= maxBadges"
             class="flex flex-wrap gap-1"
           >
+            <!-- Each label is wrapped by a badge -->
             <Badge
               v-for="item in selectedItems"
               :key="getItemValue(item)"
@@ -291,13 +295,14 @@ watch(() => props.modelValue, (newValue) => {
       </Button>
     </PopoverTrigger>
     
-    <PopoverContent :class="popoverClass">
+    <PopoverContent :class="popoverClass" align="start">
       <Command>
         <CommandInput
           :placeholder="searchPlaceholder"
           v-model="searchValue"
         />
         <CommandEmpty>{{ emptyStateText }}</CommandEmpty>
+
         <CommandList :class="listClass">
           <CommandGroup>
             <!-- Select All / Clear All option -->
@@ -321,8 +326,6 @@ watch(() => props.modelValue, (newValue) => {
                 <span>{{ getSelectAllText() }}</span>
               </div>
             </CommandItem>
-            
-            <!-- <CommandLabel v-if="groupHeading">{{ groupHeading }}</CommandLabel> -->
             
             <!-- Individual items -->
             <CommandItem
@@ -351,9 +354,9 @@ watch(() => props.modelValue, (newValue) => {
         </CommandList>
         
         <!-- Footer with selection count -->
-        <div v-if="showFooter" class="p-2 border-t bg-gray-50 text-sm text-gray-600">
+        <footer v-if="showFooter" class="p-2 border-t bg-gray-50 text-sm text-gray-600">
           {{ selectedItems.length }} of {{ props.items.length }} {{ footerText }}
-        </div>
+        </footer>
       </Command>
     </PopoverContent>
   </Popover>

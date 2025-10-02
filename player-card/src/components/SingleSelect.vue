@@ -38,9 +38,9 @@ const props = withDefaults(defineProps<Props<T>>(), {
   searchPlaceholder: "Search items...",
   emptyStateText: "No items found.",
   groupHeading: "Items",
-  buttonClass: "w-[300px] justify-between",
-  popoverClass: "w-[300px] p-0",
-  listClass: "max-h-[256px] overflow-y-auto",
+  buttonClass: "w-full justify-between",
+  popoverClass: "w-full p-0",
+  listClass: "max-h-[256px] overflow-y-auto",  // approx 5 rows
   modelValue: null,
 });
 
@@ -65,10 +65,12 @@ const displayValue = computed(() => {
 const filteredItems = computed((): T[] => {
   if (!searchValue.value) return props.items;
   
+  // Filter on searchValue appearing in item label
+  const query = searchValue.value.toLowerCase();
   return props.items.filter(item =>
     getItemLabel(item)
       .toLowerCase()
-      .includes(searchValue.value.toLowerCase())
+      .includes(query)
   );
 });
 
@@ -93,11 +95,6 @@ const selectItem = (item: T) => {
   emit("select", item);
 };
 
-const isSelected = (item: T): boolean => {
-  //console.log('selected ', selectedItem.value, item)
-  return selectedItem && getItemValue(selectedItem) === getItemValue(item);
-};
-
 // Watch for external modelValue changes
 watch(() => props.modelValue, (newValue) => {
   selectedItem.value = newValue;
@@ -105,7 +102,7 @@ watch(() => props.modelValue, (newValue) => {
 </script>
 
 <template>
-  <Popover v-model:open="open">
+  <Popover v-model:open="open" align="start">
     <PopoverTrigger as-child>
       <Button
         variant="outline"
@@ -136,7 +133,7 @@ watch(() => props.modelValue, (newValue) => {
               <Check
                 :class="[
                   'mr-2 h-4 w-4',
-                  selectedItem && getItemValue(selectedItem) === getItemValue(item) ? 'opacity-100' : 'opacity-0'
+                  selectedItem && getItemValue(selectedItem as T) === getItemValue(item) ? 'opacity-100' : 'opacity-0'
                 ]"
               />
               {{ getItemLabel(item) }}

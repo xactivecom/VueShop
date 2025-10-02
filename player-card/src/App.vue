@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
-// import { Search } from "lucide-vue-next"; // Search icon
+import { Search } from "lucide-vue-next"; // Search icon
 
 import MultiSelect from "@/components/MultiSelect.vue";
 import MultiSelectGrid, { type ColumnConfig } from "@/components/MultiSelectGrid.vue";
@@ -156,35 +156,58 @@ interface Player {
   id: string;
   fullName: string;
   teamId: string;
+  leagueId: string;
   jersey: number;
-  position: string
+  position: string;
+  birthDate?: string;
+  age?: string;
 }
 const players: Player[] = [
-  { id: "NHL-8478402", fullName: "Connor McDavid", teamId: "EDM", jersey: 97, position: "C" },
-  { id: "NHL-8477956", fullName: "David Pastrnak", teamId: "BOS", jersey: 88, position: "RW" },
-  { id: "NHL-8477492", fullName: "Nathan MacKinnon", teamId: "COL", jersey: 29, position: "C" },
-  { id: "NHL-8477934", fullName: "Leon Draisaitl", teamId: "EDM", jersey: 29, position: "C" },
-  { id: "NHL-8479318", fullName: "Auston Matthews", teamId: "TOR", jersey: 34, position: "C" },
-  { id: "NHL-8474578", fullName: "Erik Karlsson", teamId: "PIT", jersey: 65, position: "D" },
-  { id: "NHL-8476453", fullName: "Nikita Kucherov", teamId: "TBL", jersey: 86, position: "RW" },
-  { id: "NHL-8471675", fullName: "Sidney Crosby", teamId: "PIT", jersey: 87, position: "C" },
-  { id: "NHL-8471214", fullName: "Alex Ovechkin", teamId: "WSH", jersey: 8, position: "LW" },
-  { id: "NHL-8476945", fullName: "Connor Hellebuyck", teamId: "WPG", jersey: 37, position: "G" },
-  { id: "NHL-8480069", fullName: "Cale Makar", teamId: "COL", jersey: 8, position: "D" },
-  { id: "NHL-8477919", fullName: "Frederick Gaudreau", teamId: "SEA", jersey: 89, position: "C" },
-  { id: "NHL-8478427", fullName: "Sebastian Aho", teamId: "CAR", jersey: 20, position: "C" },
-  { id: "NHL-8478864", fullName: "Kirill Kaprizov", teamId: "MIN", jersey: 97, position: "LW" },
-  { id: "NHL-8481559", fullName: "Jack Hughes", teamId: "NJD", jersey: 86, position: "C" },
+  { id: "NHL-8478402", fullName: "Connor McDavid", teamId: "EDM", leagueId: "NHL", jersey: 97, position: "C", birthDate: "1997-01-13" },
+  { id: "NHL-8477956", fullName: "David Pastrnak", teamId: "BOS", leagueId: "NHL", jersey: 88, position: "RW", birthDate: "1996-05-25" },
+  { id: "NHL-8477492", fullName: "Nathan MacKinnon", teamId: "COL", leagueId: "NHL", jersey: 29, position: "C", birthDate: "1995-09-01" },
+  { id: "NHL-8477934", fullName: "Leon Draisaitl", teamId: "EDM", leagueId: "NHL", jersey: 29, position: "C", birthDate: "1995-10-27" },
+  { id: "NHL-8479318", fullName: "Auston Matthews", teamId: "TOR", leagueId: "NHL", jersey: 34, position: "C", birthDate: "1997-09-17" },
+  { id: "NHL-8474578", fullName: "Erik Karlsson", teamId: "PIT", leagueId: "NHL", jersey: 65, position: "D", birthDate: "1990-05-31" },
+  { id: "NHL-8476453", fullName: "Nikita Kucherov", teamId: "TBL", leagueId: "NHL", jersey: 86, position: "RW", birthDate: "1993-06-17" },
+  { id: "NHL-8471675", fullName: "Sidney Crosby", teamId: "PIT", leagueId: "NHL", jersey: 87, position: "C", birthDate: "1987-08-07" },
+  { id: "NHL-8471214", fullName: "Alex Ovechkin", teamId: "WSH", leagueId: "NHL", jersey: 8, position: "LW", birthDate: "1985-09-17" },
+  { id: "NHL-8476945", fullName: "Connor Hellebuyck", teamId: "WPG", leagueId: "NHL", jersey: 37, position: "G", birthDate: "1993-05-19" },
+  { id: "NHL-8480069", fullName: "Cale Makar", teamId: "COL", leagueId: "NHL", jersey: 8, position: "D", birthDate: "1998-10-30" },
+  { id: "NHL-8477919", fullName: "Frederick Gaudreau", teamId: "SEA", leagueId: "NHL", jersey: 89, position: "C", birthDate: "1993-05-01" },
+  { id: "NHL-8478427", fullName: "Sebastian Aho", teamId: "CAR", leagueId: "NHL", jersey: 20, position: "C" , birthDate: "1997-07-26"},
+  { id: "NHL-8478864", fullName: "Kirill Kaprizov", teamId: "MIN", leagueId: "NHL", jersey: 97, position: "LW", birthDate: "1997-04-26" },
+  { id: "NHL-8481559", fullName: "Jack Hughes", teamId: "NJD", leagueId: "NHL", jersey: 86, position: "C", birthDate: "2001-05-14" },
 ];
 
-const selectedPlayers = ref<Set<string>>(new Set());
+// Convert birh date to current age
+const calcAgeFromBirth = (birthDate: string): string => {
+  const today = new Date();
+  const dateOfBirth = new Date(birthDate);
+  let age = today.getFullYear() - dateOfBirth.getFullYear();
+  const monthDiff = today.getMonth() - dateOfBirth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
+    age--;
+  }
+  return age.toString();
+};
 
+// Player popup columns
 const playerColumns: ColumnConfig<Player>[] = [
-  { key: "fullName", label: "Name", width: 4 },
+  { key: "fullName", label: "Name", width: 5 },
   { key: "teamId", label: "Team", width: 2 },
-  { key: "jersey", label: "Jersey", width: 2, format: (val: number) => `#${val}` },
-  { key: "position", label: "Position", width: 1 },
+  { key: "leagueId", label: "League", width: 2, },
+  { key: "position", label: "Pos", width: 1 },
+  { key: "birthDate", label: "Age", width: 1, format: (date) => { return calcAgeFromBirth(date); }},
 ];
+
+// Reactive state
+const selectedPlayers = ref<Player[]>([]);
+
+// Event handlers
+const onPlayerSelect = (player: Player, selected: boolean) => {
+  console.log("Player selected:", player, selected);
+}
 
 // Set default selections
 onMounted(() => {
@@ -198,8 +221,8 @@ onMounted(() => {
 
 
 <template>
-  <!-- Header -->
-  <div class="h-8 mb-4 bg-blue-500"></div>
+  <!-- Header - fixed to top -->
+  <div class="fixed top-0 left-0 w-full h-8 mb-4 bg-blue-500"></div>
 
   <div class="m-2">
     <h1 class="text-2xl text-gray-800">Portal Blocks Demo</h1>
@@ -251,19 +274,18 @@ onMounted(() => {
 
     <!-- Single selection field, limited to 5 rows, label -->
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
-        <Label for="reportType">Report Type</Label>
+      <div class="p-2 grid w-[180px] max-w-sm items-center gap-1.5">
+        <Label for="reportType">Report Types</Label>
         <MultiSelect
           v-model = "selectedReportTypes"
           :items = "reportTypes"
           valueKey = "id"
           labelKey = "label"
-          placeholder = "Select report ..."
+          placeholder = "Select reports ..."
           searchPlaceholder = "Search report types ..."
           emptyStateText = "No report types found."
           groupHeading = "Report Types"
-          :maxSelections = 1
-          buttonClass = "w-[180px] justify-between"
+          :maxBadges = 1
           popoverClass = "w-[180px] p-0"
           listClass = "max-h-[168px] overflow-y-auto""
           :showSelectAll = false
@@ -280,7 +302,7 @@ onMounted(() => {
     </div>
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
+      <div class="p-2 grid w-[180px] max-w-sm items-center gap-1.5">
         <Label for="reportType">Game Types</Label>
         <MultiSelect
           v-model = "selectedGameTypes"
@@ -293,7 +315,6 @@ onMounted(() => {
           groupHeading = "Game types"
           :exclusiveValues = "['combined']"
           :maxBadges = 1
-          buttonClass = "w-[180px] justify-between"
           popoverClass = "w-[180px] p-0"
           :showSelectAll = false
           :showFooter = false
@@ -309,8 +330,8 @@ onMounted(() => {
     </div>
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
-        <Label for="reportType">Seasons</Label>
+      <div class="p-2 grid w-[180px] max-w-sm items-center gap-1.5">
+        <Label for="reportType">Game Seasons</Label>
         <MultiSelect
           v-model = "selectedSeasons"
           :items = "seasons"
@@ -321,7 +342,6 @@ onMounted(() => {
           emptyStateText = "No seasons found."
           groupHeading = "Seasons"
           :maxBadges = 1
-          buttonClass = "w-[180px] justify-between"
           popoverClass = "w-[180px] p-0"
           :showFooter = false
           @select = "onSeasonSelect"
@@ -336,8 +356,8 @@ onMounted(() => {
     </div>
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
-        <Label for="reportType">Select Teams</Label>
+      <div class="p-2 grid w-[200px] max-w-sm items-center gap-1.5">
+        <Label for="reportType">Franchise Teams</Label>
         <MultiSelect
           v-model = "selectedTeams"
           :items = "franchiseTeams"
@@ -346,10 +366,9 @@ onMounted(() => {
           badgeKey = "id"
           placeholder = "Select teams ..."
           searchPlaceholder = "Search teams ..."
-          emptyStateText = "No teams found."
+          emptyStateText = "No matching teams found."
           groupHeading = "Franchise Teams"
           :maxBadges = 2
-          buttonClass = "w-[200px] justify-between"
           popoverClass = "w-[240px] p-0"
           :showFooter = false
           @select = "onTeamSelect"
@@ -364,32 +383,31 @@ onMounted(() => {
     </div>
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
+      <div class="p-2 grid w-[240px] max-w-sm items-center gap-1.5">
         <Label for="reportType">Select Players</Label>
         <MultiSelectGrid
           v-model = "selectedPlayers"
           :items = "players"
           :columns = "playerColumns"
-          idKey = "id"
-          displayKey = "fullName"
+          valueKey = "id"
+          labelKey = "fullName"
+          badgeKey = "fullName"
           placeholder = "Select players ..."
           searchPlaceholder = "Search players by name, team ..."
           emptyStateText = "No matching players found."
+          :maxBadges = 1
+          :showFooter = false
+          popoverClass = "w-[500px] p-0"
+          @select = "onPlayerSelect"
         />
       </div>
-      <!-- <div class="p-2 text-xs text-gray-500">
-        Selected players: {{ selectedPlayers?.forEach(p => p).join(", ") }}
-      </div> -->
+      <div class="p-2 text-xs text-gray-500">
+        Selected players:
+        <ul v-for="player in selectedPlayers">
+          <li class="ml-2">id: {{ player.id }}; name: {{ player.fullName }}; team: {{ player.teamId }}</li>
+        </ul>
+      </div>
     </div>
-
-    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <span class="p-2 pt-4 text-xs text-blue-500">Form component with validated input field.</span>
-      <SimpleForm>
-      </SimpleForm>
-    </div> -->
-
-
-  </div>
 
   <!-- <div class="max-w-sm space-y-3">
     <SearchAutocomplete
@@ -403,6 +421,8 @@ onMounted(() => {
     </p>
   </div> -->
 
-  <!-- Footer -->
-  <div class="h-4 mt-4 bg-yellow-200"></div>
+  </div>
+
+  <!-- Footer - fixed to bottom -->
+  <div class="fixed bottom-0 left-0 w-full h-4 mt-4 bg-yellow-200"></div>
 </template>
