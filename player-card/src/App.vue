@@ -209,6 +209,27 @@ const onPlayerSelect = (player: Player, selected: boolean) => {
   console.log("Player selected:", player, selected);
 }
 
+
+// Roster selections
+interface Roster {
+  id: string;
+  fullName: string;
+  teamName: string;
+  leagueId: string;
+}
+const roster: Roster[] = [
+  { id: "NHL-8478402", fullName: "Connor McDavid", teamName: "Edmonton Oilers", leagueId: "NHL" },
+  { id: "NHL-8477956", fullName: "David Pastrnak", teamName: "Boston Bruins", leagueId: "NHL" },
+  { id: "NHL-8477492", fullName: "Nathan MacKinnon", teamName: "Colorado Avalanche", leagueId: "NHL" },
+  { id: "NHL-8481559", fullName: "Jack Hughes", teamName: "New Jersey Devils", leagueId: "NHL" },
+
+  { id: "AHL-10551", fullName: "Ryan Kirwan", teamName: "Toronto Marlies", leagueId: "AHL" },
+  { id: "AHL-10601", fullName: "Tyler Thorpe", teamName: "Laval Rockets", leagueId: "AHL" },
+
+  { id: "OHL-888182", fullName: "Seth Ronan", teamName: "London Knights", leagueId: "OHL" },
+  { id: "OHL-747988", fullName: "Carson Cameron", teamName: "Peterborough Petes", leagueId: "OHL" },
+];
+
 // Set default selections
 onMounted(() => {
   // Default to the first report type
