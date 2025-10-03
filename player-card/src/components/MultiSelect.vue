@@ -19,6 +19,7 @@ import { Check, ChevronDown, X, Minus } from "lucide-vue-next";
 
 // Properties interface
 interface Props<T> {
+  id?: string;
   items: T[];
   valueKey: keyof T;
   labelKey: keyof T;
@@ -52,7 +53,7 @@ const props = withDefaults(defineProps<Props<T>>(), {
   groupHeading: "Items",
   buttonClass: "w-full justify-between",
   popoverClass: "w-full p-0",
-  listClass: "max-h-[256px] overflow-y-auto", // approx 5 items
+  listClass: "max-h-[256px] overflow-auto", // approx 5 items
   maxSelections: undefined,
   maxBadges: 2,
   showSelectAll: true,
@@ -76,17 +77,17 @@ const emit = defineEmits<{
 }>();
 
 // Reactive state
-const open = ref(false);
-const searchValue = ref("");
+const isOpen = ref(false);
+const searchTerm = ref("");
 const selectedItems = ref<T[]>([...props.modelValue]) as Ref<T[]>;
 const selectAllValue = "__select_all__";
 
 // Computed properties
 const filteredItems = computed(() => {
-  if (!searchValue.value) return props.items;
+  if (!searchTerm.value) return props.items;
 
-  // Filter on searchValue appearing in item label
-  const query = searchValue.value.toLowerCase();
+  // Filter on searchTerm appearing in item label
+  const query = searchTerm.value.toLowerCase();
   return props.items.filter(item =>
     getItemLabel(item)
       .toLowerCase()
@@ -145,7 +146,7 @@ const canSelectItem = (item: T): boolean => {
   if (isMaxSelectionsReached()) {
     // Can still select if it's an exclusive item (which will clear others)
     return isExclusiveItem(item);
-  }  
+  }
   return true;
 };
 
@@ -237,7 +238,7 @@ const getSelectAllText = (): string => {
 
 const openPopover = () => {
   // Clear previous search value
-  searchValue.value = "";
+  searchTerm.value = "";
 };
 
 // Watch for external modelValue changes
@@ -247,17 +248,18 @@ watch(() => props.modelValue, (newValue) => {
 
 // Prevent dropdown from closing on selection
 // const handleSelectInteraction = () => {
-  // Can keep popover open by setting: open.value = false
+  // Can keep popover open by setting: isOpen.value = false
 // }
 </script>
 
 <template>
-  <Popover v-model:open="open" @update:open="openPopover">
+  <Popover v-model:open="isOpen" @update:open="openPopover">
     <PopoverTrigger as-child>
       <Button
+        :id="id"
         variant="outline"
         role="combobox"
-        :aria-expanded="open"
+        :aria-expanded="isOpen"
         :class="buttonClass"
       >
         <div class="flex flex-wrap gap-1 flex-1 text-left min-h-5">
@@ -299,12 +301,12 @@ watch(() => props.modelValue, (newValue) => {
       <Command>
         <CommandInput
           :placeholder="searchPlaceholder"
-          v-model="searchValue"
+          v-model="searchTerm"
         />
         <CommandEmpty>{{ emptyStateText }}</CommandEmpty>
 
         <CommandList :class="listClass">
-          <CommandGroup>
+          <CommandGroup :heading="groupHeading">
             <!-- Select All / Clear All option -->
             <CommandItem
               v-if="showSelectAll"

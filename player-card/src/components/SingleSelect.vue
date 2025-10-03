@@ -18,6 +18,7 @@ import { Check, ChevronDown } from "lucide-vue-next";
 
 // Properties interface
 interface Props<T> {
+  id?: string;
   items: T[];
   placeholder?: string;
   searchPlaceholder?: string;
@@ -40,7 +41,7 @@ const props = withDefaults(defineProps<Props<T>>(), {
   groupHeading: "Items",
   buttonClass: "w-full justify-between",
   popoverClass: "w-full p-0",
-  listClass: "max-h-[256px] overflow-y-auto",  // approx 5 rows
+  listClass: "max-h-[256px] overflow-auto",  // approx 5 rows
   modelValue: null,
 });
 
@@ -51,8 +52,8 @@ const emit = defineEmits<{
 }>();
 
 // Reactive state
-const open = ref(false);
-const searchValue = ref("");
+const isOpen = ref(false);
+const searchTerm = ref("");
 const selectedItem = ref<T | null | undefined>(props.modelValue);
 
 // Computed properties
@@ -63,10 +64,10 @@ const displayValue = computed(() => {
 });
 
 const filteredItems = computed((): T[] => {
-  if (!searchValue.value) return props.items;
+  if (!searchTerm.value) return props.items;
   
-  // Filter on searchValue appearing in item label
-  const query = searchValue.value.toLowerCase();
+  // Filter on searchTerm appearing in item label
+  const query = searchTerm.value.toLowerCase();
   return props.items.filter(item =>
     getItemLabel(item)
       .toLowerCase()
@@ -87,8 +88,8 @@ const getItemLabel = (item: T): string => {
 
 const selectItem = (item: T) => {
   selectedItem.value = item;
-  open.value = false;
-  searchValue.value = "";
+  isOpen.value = false;
+  searchTerm.value = "";
   
   // Emit events
   emit("update:modelValue", item);
@@ -102,12 +103,13 @@ watch(() => props.modelValue, (newValue) => {
 </script>
 
 <template>
-  <Popover v-model:open="open" align="start">
+  <Popover v-model:open="isOpen" align="start">
     <PopoverTrigger as-child>
       <Button
+        :id="id"
         variant="outline"
         role="combobox"
-        :aria-expanded="open"
+        :aria-expanded="isOpen"
         :class="buttonClass"
       >
         {{ displayValue }}
@@ -119,7 +121,7 @@ watch(() => props.modelValue, (newValue) => {
       <Command>
         <CommandInput
           :placeholder="searchPlaceholder"
-          v-model="searchValue"
+          v-model="searchTerm"
         />
         <CommandEmpty>{{ emptyStateText }}</CommandEmpty>
         <CommandList :class="listClass">

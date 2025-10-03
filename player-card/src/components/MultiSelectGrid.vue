@@ -19,7 +19,7 @@ import { Check, ChevronDown, X } from "lucide-vue-next";
 
 // Property item configuation
 export interface ColumnConfig<T> {
-  key: keyof T;
+  id: keyof T;
   label: string;
   width?: number; // Column width in grid units (1-12)
   format?: (value: any) => string;
@@ -27,6 +27,7 @@ export interface ColumnConfig<T> {
 
 // Properties interface
 interface Props<T> {
+  id?: string;
   items: T[];
   columns: ColumnConfig<T>[];
   valueKey: keyof T;
@@ -52,7 +53,7 @@ const props = withDefaults(defineProps<Props<T>>(), {
   emptyStateText: "No items found.",
   buttonClass: "w-full justify-between",
   popoverClass: "w-full p-0",
-  listClass: "max-h-[240px] overflow-auto", // approx 5 items
+  listClass: "max-h-[256px] overflow-auto p-0", // approx 5 items
   maxBadges: 2,
   showFooter: true,
   selectedCountText: "items selected",
@@ -67,19 +68,19 @@ const emit = defineEmits<{
 }>();
 
 // Reactive state
-const open = ref(false);
-const searchValue = ref("");
+const isOpen = ref(false);
+const searchTerm = ref("");
 const selectedItems = ref<T[]>([...props.modelValue]) as Ref<T[]>;
 
 // Computed properties
 const filteredItems = computed(() => {
-  if (!searchValue.value) return props.items;
+  if (!searchTerm.value) return props.items;
 
-  // Filter on searchValue appearing in any column
-  const query = searchValue.value.toLowerCase();
+  // Filter on searchTerm appearing in any column
+  const query = searchTerm.value.toLowerCase();
   return props.items.filter(item =>
     props.columns.some(col => {
-      const value = item[col.key];
+      const value = item[col.id];
       return value?.toString().toLowerCase().includes(query);
     })
   );
@@ -146,23 +147,24 @@ const getColumnClass = (width?: number) => {
 };
 
 const formatValue = (item: T, column: ColumnConfig<T>) => {
-  const value = item[column.key];
+  const value = item[column.id];
   return column.format ? column.format(value) : value?.toString() || "";
 };
 
 const openPopover = () => {
   // Clear previous search value
-  searchValue.value = "";
+  searchTerm.value = "";
 };
 </script>
 
 <template>
-  <Popover v-model:open="open" @update:open="openPopover">
+  <Popover v-model:open="isOpen" @update:open="openPopover">
     <PopoverTrigger as-child>
       <Button
+        :id="id"
         variant="outline"
         role="combobox"
-        :aria-expanded="open"
+        :aria-expanded="isOpen"
         :class="buttonClass"
       >
         <div class="flex flex-wrap gap-1 flex-1 text-left min-h-5">
@@ -204,19 +206,19 @@ const openPopover = () => {
       <Command>
         <CommandInput
           :placeholder="searchPlaceholder"
-          v-model="searchValue"
+          v-model="searchTerm"
         />
         <CommandEmpty>{{ emptyStateText }}</CommandEmpty>
 
-        <!-- <CommandList class="listClass"> -->
-        <CommandList class="listClass">
-          <CommandGroup>
+        <CommandList>
+          <!-- Note: sticky header requires height/overflow styles on CommandGroup -->
+          <CommandGroup :class="listClass">
             <!-- Grid header -->
-            <div class="sticky top-0 w-full bg-background border-b grid grid-cols-12 gap-2 px-2 py-2 font-semibold text-sm">
+            <div class="sticky top-0 w-full bg-background border-b grid grid-cols-12 px-2 pt-3 pb-2 font-semibold text-sm z-2">
               <div class="col-span-1"></div>
               <div
                 v-for="column in columns"
-                :key="String(column.key)"
+                :key="String(column.id)"
                 :class="getColumnClass(column.width)"
               >
                 {{ column.label }}
@@ -240,7 +242,7 @@ const openPopover = () => {
               </div>
               <div
                 v-for="column in columns"
-                :key="String(column.key)"
+                :key="String(column.id)"
                 :class="getColumnClass(column.width)"
               >
                 {{ formatValue(item, column) }}

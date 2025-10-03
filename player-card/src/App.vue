@@ -194,11 +194,11 @@ const calcAgeFromBirth = (birthDate: string): string => {
 
 // Player popup columns
 const playerColumns: ColumnConfig<Player>[] = [
-  { key: "fullName", label: "Name", width: 5 },
-  { key: "teamId", label: "Team", width: 2 },
-  { key: "leagueId", label: "League", width: 2, },
-  { key: "position", label: "Pos", width: 1 },
-  { key: "birthDate", label: "Age", width: 1, format: (date) => { return calcAgeFromBirth(date); }},
+  { id: "fullName", label: "Name", width: 5 },
+  { id: "teamId", label: "Team", width: 2 },
+  { id: "leagueId", label: "League", width: 2, },
+  { id: "position", label: "Pos", width: 1 },
+  { id: "birthDate", label: "Age", width: 1, format: (date) => { return calcAgeFromBirth(date); }},
 ];
 
 // Reactive state
@@ -229,6 +229,21 @@ const roster: Roster[] = [
   { id: "OHL-888182", fullName: "Seth Ronan", teamName: "London Knights", leagueId: "OHL" },
   { id: "OHL-747988", fullName: "Carson Cameron", teamName: "Peterborough Petes", leagueId: "OHL" },
 ];
+
+// Roster popup columns
+const rosterColumns: ColumnConfig<Roster>[] = [
+  { id: "fullName", label: "Name", width: 5 },
+  { id: "teamName", label: "Team", width: 4 },
+  { id: "leagueId", label: "League", width: 2, },
+];
+
+// Reactive state
+const selectedRoster = ref<Roster[]>([]);
+
+// Event handlers
+const onRosterSelect = (roster: Roster, selected: boolean) => {
+  console.log("Roster selected:", roster, selected);
+}
 
 // Set default selections
 onMounted(() => {
@@ -296,8 +311,9 @@ onMounted(() => {
     <!-- Single selection field, limited to 5 rows, label -->
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
       <div class="p-2 grid w-[180px] max-w-sm items-center gap-1.5">
-        <Label for="reportType">Report Types</Label>
+        <Label for="reportTypes">Report Types</Label>
         <MultiSelect
+          id = "reportTypes"
           v-model = "selectedReportTypes"
           :items = "reportTypes"
           valueKey = "id"
@@ -308,7 +324,7 @@ onMounted(() => {
           groupHeading = "Report Types"
           :maxBadges = 1
           popoverClass = "w-[180px] p-0"
-          listClass = "max-h-[168px] overflow-y-auto""
+          listClass = "max-h-[170px] overflow-auto"
           :showSelectAll = false
           :showFooter = false
           @select = "onReportTypeSelect"
@@ -324,8 +340,9 @@ onMounted(() => {
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
       <div class="p-2 grid w-[180px] max-w-sm items-center gap-1.5">
-        <Label for="reportType">Game Types</Label>
+        <Label for="gameTypes">Game Types</Label>
         <MultiSelect
+          id = "gameTypes"
           v-model = "selectedGameTypes"
           :items = "gameTypes"
           valueKey = "id"
@@ -352,8 +369,9 @@ onMounted(() => {
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
       <div class="p-2 grid w-[180px] max-w-sm items-center gap-1.5">
-        <Label for="reportType">Game Seasons</Label>
+        <Label for="seaons">Game Seasons</Label>
         <MultiSelect
+          id = "seasons"
           v-model = "selectedSeasons"
           :items = "seasons"
           valueKey = "id"
@@ -377,9 +395,10 @@ onMounted(() => {
     </div>
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <div class="p-2 grid w-[200px] max-w-sm items-center gap-1.5">
-        <Label for="reportType">Franchise Teams</Label>
+      <div class="p-2 grid w-[220px] max-w-sm items-center gap-1.5">
+        <Label for="teams">Franchise Teams</Label>
         <MultiSelect
+          id = "teams"
           v-model = "selectedTeams"
           :items = "franchiseTeams"
           valueKey = "id"
@@ -390,7 +409,7 @@ onMounted(() => {
           emptyStateText = "No matching teams found."
           groupHeading = "Franchise Teams"
           :maxBadges = 2
-          popoverClass = "w-[240px] p-0"
+          popoverClass = "w-[260px] p-0"
           :showFooter = false
           @select = "onTeamSelect"
           @selectAll = "onTeamSelectAll"
@@ -405,8 +424,9 @@ onMounted(() => {
 
     <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
       <div class="p-2 grid w-[240px] max-w-sm items-center gap-1.5">
-        <Label for="reportType">Select Players</Label>
+        <Label for="players">Select Players</Label>
         <MultiSelectGrid
+          id = "players"
           v-model = "selectedPlayers"
           :items = "players"
           :columns = "playerColumns"
@@ -430,17 +450,28 @@ onMounted(() => {
       </div>
     </div>
 
-  <!-- <div class="max-w-sm space-y-3">
-    <SearchAutocomplete
-      v-model="chosen"
-      :items="libs"
-      placeholder="Search libraries"
-      searchPlaceholder="Type to filter…"
-    />
-    <p class="text-sm text-muted-foreground">
-      Selected: <span class="font-medium">{{ chosen?.label ?? "—" }}</span>
-    </p>
-  </div> -->
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+      <div class="p-2 grid w-[240px] max-w-sm items-center gap-1.5">
+        <Label for="roster">Select Roster</Label>
+        <Autocomplete
+          id = "roster"
+          v-model="selectedRoster"
+          :items="roster"
+          :columns = "rosterColumns"
+          valueKey = "id"
+          labelKey = "fullName"
+          placeholder="Search roster ..."
+          popoverClass = "w-[500px] p-0"
+          @select = "onRosterSelect"
+        />
+      </div>
+      <div class="p-2 text-xs text-gray-500">
+        Selected roster:
+        <ul v-for="roster in selectedRoster">
+          <li class="ml-2">id: {{ roster.id }}; name: {{ roster.fullName }}; team: {{ roster.teamName }}</li>
+        </ul>
+      </div>
+    </div>
 
   </div>
 
