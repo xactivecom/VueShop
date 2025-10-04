@@ -18,7 +18,7 @@ import {
 import { Check, ChevronDown, X } from "lucide-vue-next";
 
 // Property item configuation
-export interface ColumnConfig<T> {
+export interface MultiColumnConfig<T> {
   id: keyof T;
   label: string;
   width?: number; // Column width in grid units (1-12)
@@ -29,7 +29,7 @@ export interface ColumnConfig<T> {
 interface Props<T> {
   id?: string;
   items: T[];
-  columns: ColumnConfig<T>[];
+  columns: MultiColumnConfig<T>[];
   valueKey: keyof T;
   labelKey: keyof T;
   badgeKey?: keyof T;
@@ -125,7 +125,7 @@ const toggleItem = (item: T) => {
 };
 
 const getColumnClass = (width?: number) => {
-  // Return complete class names that Tailwind can detect.
+  // Return complete class names that Tailwind can detect during layout.
   // Note: the Tailwind JIT compiler must see a static class name; it
   // cannot recognize a dynamic class name.
   const w = width || 1;
@@ -146,7 +146,7 @@ const getColumnClass = (width?: number) => {
   return classMap[w] || 'col-span-1';
 };
 
-const formatValue = (item: T, column: ColumnConfig<T>) => {
+const formatValue = (item: T, column: MultiColumnConfig<T>) => {
   const value = item[column.id];
   return column.format ? column.format(value) : value?.toString() || "";
 };

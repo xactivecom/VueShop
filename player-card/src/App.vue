@@ -8,7 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Search } from "lucide-vue-next"; // Search icon
 
 import MultiSelect from "@/components/MultiSelect.vue";
-import MultiSelectGrid, { type ColumnConfig } from "@/components/MultiSelectGrid.vue";
+import MultiSelectGrid, { type MultiColumnConfig } from "@/components/MultiSelectGrid.vue";
+import AutocompleteGrid, { type AutoColumnConfig } from "@/components/AutocompleteGrid.vue";
 
 // Search model for activeOnly checkbox
 const isActiveOnly = ref(true);
@@ -193,7 +194,7 @@ const calcAgeFromBirth = (birthDate: string): string => {
 };
 
 // Player popup columns
-const playerColumns: ColumnConfig<Player>[] = [
+const playerColumns: MultiColumnConfig<Player>[] = [
   { id: "fullName", label: "Name", width: 5 },
   { id: "teamId", label: "Team", width: 2 },
   { id: "leagueId", label: "League", width: 2, },
@@ -219,9 +220,11 @@ interface Roster {
 }
 const roster: Roster[] = [
   { id: "NHL-8478402", fullName: "Connor McDavid", teamName: "Edmonton Oilers", leagueId: "NHL" },
+  { id: "NHL-8482067", fullName: "Connor Mackey", teamName: "New York Rangers", leagueId: "NHL" },
   { id: "NHL-8477956", fullName: "David Pastrnak", teamName: "Boston Bruins", leagueId: "NHL" },
   { id: "NHL-8477492", fullName: "Nathan MacKinnon", teamName: "Colorado Avalanche", leagueId: "NHL" },
   { id: "NHL-8481559", fullName: "Jack Hughes", teamName: "New Jersey Devils", leagueId: "NHL" },
+  { id: "NHL-8481711", fullName: "Matias Maccelli", teamName: "Toronto Maple Leafs", leagueId: "NHL" },
 
   { id: "AHL-10551", fullName: "Ryan Kirwan", teamName: "Toronto Marlies", leagueId: "AHL" },
   { id: "AHL-10601", fullName: "Tyler Thorpe", teamName: "Laval Rockets", leagueId: "AHL" },
@@ -231,18 +234,18 @@ const roster: Roster[] = [
 ];
 
 // Roster popup columns
-const rosterColumns: ColumnConfig<Roster>[] = [
-  { id: "fullName", label: "Name", width: 5 },
+const rosterColumns: AutoColumnConfig<Roster>[] = [
+  { id: "fullName", label: "Name", width: 6, isSearchable: true },
   { id: "teamName", label: "Team", width: 4 },
   { id: "leagueId", label: "League", width: 2, },
 ];
 
 // Reactive state
-const selectedRoster = ref<Roster[]>([]);
+const selectedRoster = ref<Roster | null>(null);
 
 // Event handlers
-const onRosterSelect = (roster: Roster, selected: boolean) => {
-  console.log("Roster selected:", roster, selected);
+const onRosterSelect = (roster: Roster) => {
+  console.log("Roster selected:", roster);
 }
 
 // Set default selections
@@ -264,7 +267,7 @@ onMounted(() => {
     <h1 class="text-2xl text-gray-800">Portal Blocks Demo</h1>
     
     <!-- Text input field, label -->
-    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-gray-100">
       <span class="p-2 pt-4 text-xs text-blue-500">Text input field. Verical aligned label.</span>
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="playerName">Player Name</Label>
@@ -273,7 +276,7 @@ onMounted(() => {
     </div> -->
 
     <!-- Search input field, label -->
-    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-gray-100">
       <span class="p-2 pt-4 text-xs text-blue-500">Search input field with icon. Verical aligned label.</span>
       <div class="p-2 grid w-full max-w-sm items-center gap-1.5">
         <Label for="searchName">Search Name</Label>
@@ -287,7 +290,7 @@ onMounted(() => {
     </div> -->
 
     <!-- Search input field, label, checkbox -->
-    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+    <!-- <div class="my-4 border border-solid border-gray-200 rounded-md bg-gray-100">
       <span class="p-2 pt-4 text-xs text-blue-500">Search input field with icon. Verical aligned label.
         Horizontally aligned checkbox.
       </span>
@@ -309,7 +312,7 @@ onMounted(() => {
     </div> -->
 
     <!-- Single selection field, limited to 5 rows, label -->
-    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-gray-100">
       <div class="p-2 grid w-[180px] max-w-sm items-center gap-1.5">
         <Label for="reportTypes">Report Types</Label>
         <MultiSelect
@@ -332,13 +335,13 @@ onMounted(() => {
           @clearAll = "onReportTypeClearAll"
         />
       </div>
-      <div class="p-2 text-xs text-gray-500">
+      <div class="p-2 text-xs text-gray-600">
         Selected report types: {{ selectedReportTypes?.map(r => r.id).join(", ") }}
           ; names: {{ selectedReportTypes?.map(r => r.label).join(", ") }}
       </div>
     </div>
 
-    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-gray-100">
       <div class="p-2 grid w-[180px] max-w-sm items-center gap-1.5">
         <Label for="gameTypes">Game Types</Label>
         <MultiSelect
@@ -361,13 +364,13 @@ onMounted(() => {
           @clearAll = "onGameTypeClearAll"
         />
       </div>
-      <div class="p-2 text-xs text-gray-500">
+      <div class="p-2 text-xs text-gray-600">
         Selected game types: {{ selectedGameTypes?.map(r => r.id).join(", ") }}
           ; names: {{ selectedGameTypes?.map(r => r.label).join(", ") }}
       </div>
     </div>
 
-    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-gray-100">
       <div class="p-2 grid w-[180px] max-w-sm items-center gap-1.5">
         <Label for="seaons">Game Seasons</Label>
         <MultiSelect
@@ -388,13 +391,13 @@ onMounted(() => {
           @clearAll = "onSeasonClearAll"
         />
       </div>
-      <div class="p-2 text-xs text-gray-500">
+      <div class="p-2 text-xs text-gray-600">
         Selected seasons: {{ selectedSeasons?.map(r => r.id).join(", ") }}
           ; names: {{ selectedSeasons?.map(r => r.label).join(", ") }}
       </div>
     </div>
 
-    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-gray-100">
       <div class="p-2 grid w-[220px] max-w-sm items-center gap-1.5">
         <Label for="teams">Franchise Teams</Label>
         <MultiSelect
@@ -416,13 +419,13 @@ onMounted(() => {
           @clearAll = "onTeamClearAll"
         />
       </div>
-      <div class="p-2 text-xs text-gray-500">
+      <div class="p-2 text-xs text-gray-600">
         Selected teams: {{ selectedTeams?.map(t => t.id).join(", ") }}
           ; names: {{ selectedTeams?.map(t => t.label).join(", ") }}
       </div>
     </div>
 
-    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-gray-100">
       <div class="p-2 grid w-[240px] max-w-sm items-center gap-1.5">
         <Label for="players">Select Players</Label>
         <MultiSelectGrid
@@ -442,7 +445,7 @@ onMounted(() => {
           @select = "onPlayerSelect"
         />
       </div>
-      <div class="p-2 text-xs text-gray-500">
+      <div class="p-2 text-xs text-gray-600">
         Selected players:
         <ul v-for="player in selectedPlayers">
           <li class="ml-2">id: {{ player.id }}; name: {{ player.fullName }}; team: {{ player.teamId }}</li>
@@ -450,26 +453,23 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="my-4 border border-solid border-gray-200 rounded-md bg-white">
-      <div class="p-2 grid w-[240px] max-w-sm items-center gap-1.5">
+    <div class="my-4 border border-solid border-gray-200 rounded-md bg-gray-100">
+      <div class="p-2 grid w-[300px] max-w-sm items-center gap-1.5">
         <Label for="roster">Select Roster</Label>
-        <Autocomplete
+        <AutocompleteGrid
           id = "roster"
           v-model="selectedRoster"
           :items="roster"
           :columns = "rosterColumns"
           valueKey = "id"
           labelKey = "fullName"
-          placeholder="Search roster ..."
+          placeholder="Enter 3+ characters ..."
           popoverClass = "w-[500px] p-0"
           @select = "onRosterSelect"
         />
       </div>
-      <div class="p-2 text-xs text-gray-500">
-        Selected roster:
-        <ul v-for="roster in selectedRoster">
-          <li class="ml-2">id: {{ roster.id }}; name: {{ roster.fullName }}; team: {{ roster.teamName }}</li>
-        </ul>
+      <div class="p-2 text-xs text-gray-600">
+        Selected roster: {{ selectedRoster }}
       </div>
     </div>
 
