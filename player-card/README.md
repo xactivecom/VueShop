@@ -68,6 +68,7 @@ Install some shadcn components:
 npx shadcn-vue@latest add button input label
 npx shadcn-vue@latest add checkbox badge switch
 npx shadcn-vue@latest add popover command
+npx shadcn-vue@latest add navigation-menu
 ```
 
 Install some shadcn table components:

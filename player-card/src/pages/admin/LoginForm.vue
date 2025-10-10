@@ -31,6 +31,11 @@ import {
         <Input id="password" type="password" required />
       </div>
       <Button type="submit" class="w-full">Login</Button>
+      <div class="flex w-full items-center">
+        <hr class="flex-grow border-t" />
+        <span class="px-4">or</span>
+        <hr class="flex-grow border-t" />
+      </div>
       <Button variant="outline" class="w-full">Login with Google</Button>
     </div>
     <div class="mt-4 text-center text-sm">
